@@ -1685,7 +1685,40 @@ body[data-ui="racing"] .studio-countdown-hud[data-n="go"]::before { --l1: #2bff6
 .stage #autoResetPill { background: var(--t-chip); color: var(--t-ink); border: 2px solid var(--t-line) !important; font-size: 13px; }
 @media (max-width: 900px) {
   .stage .layout-cards-grid { grid-template-columns: 1fr 1fr 1fr; }
-  .stage .output-studio-layout { grid-template-columns: 1fr; }
+  .stage .output-studio-layout { grid-template-columns: 320px 1fr; gap: 4vw; justify-items: stretch; }
+}
+@media (max-width: 680px) {
+  .stage .output-studio-layout { grid-template-columns: 1fr; justify-items: center; }
+}
+
+/* Decor: landscape = one picture; portrait = top band + bottom band */
+.ui-decor .decor-top, .ui-decor .decor-bot { display: none; }
+@media (orientation: portrait) {
+  .ui-decor .decor-land, .ui-decor .land-only { display: none; }
+  .ui-decor .decor-top, .ui-decor .decor-bot { display: block; height: calc(100vw * 410 / 1180); overflow: hidden; }
+  .ui-decor .decor-top { top: 0; bottom: auto; }
+  .ui-decor .decor-bot { top: auto; bottom: 0; }
+}
+
+/* PORTRAIT (iPad standing in a booth box): square in the middle,
+   prompt above it, thumbnails + shutter + cancel in a row below it. */
+@media (orientation: portrait) {
+  .stage .camera-bottom-deck { --band: max(170px, calc((100vh - 100vw) / 2)); }
+  .stage .deck-flank-left, .stage .shutter-btn-wrapper, .stage .deck-flank-right {
+    top: auto; bottom: 0; height: var(--band); width: auto; transform: none;
+    display: flex; align-items: center; justify-content: center; pointer-events: auto;
+  }
+  .stage .shutter-btn-wrapper { left: 50%; right: auto; transform: translateX(-50%); flex-direction: column; }
+  .stage .deck-flank-left { left: 0; right: auto; width: calc(50% - 90px); flex-direction: row; }
+  .stage .deck-flank-right { right: 0; left: auto; width: calc(50% - 90px); }
+  .stage .reel-preview-cluster { flex-direction: row; gap: 10px; }
+  .stage .mini-reel-thumb { width: min(8vh, 84px); height: min(8vh, 84px); }
+  .stage .camera-red-shutter { width: min(12vh, 130px); height: min(12vh, 130px); }
+  .stage .studio-top-overlay { padding-top: max(3vh, calc((100vh - 100vw) / 4 - 30px)); }
+  .stage .studio-prompt-text { max-width: 86vw; }
+  .stage .layout-schematic { height: auto; min-height: 20vh; }
+  .stage .mini-photo-slot { width: 6.5vh; height: 6.5vh; }
+  .stage .hero-sub { max-width: 80vw; }
 }
 
 /* Admin: booth theme picker */
@@ -2501,12 +2534,26 @@ function abortSession() {
 /* ========================================================== */
 /* CAMERA HARDWARE & CAPTURE ENGINE                           */
 /* ========================================================== */
+function isPortraitScreen() { return window.innerHeight > window.innerWidth; }
+
+// Turning the tablet while on the camera screen: reopen the camera the new way round.
+let lastPortrait = isPortraitScreen();
+window.addEventListener('resize', () => {
+  const p = isPortraitScreen();
+  if (p === lastPortrait) return;
+  lastPortrait = p;
+  if (currentActiveView === 'viewCamera' && mediaStream && !isAutoCapturing) { closeMediaStream(); openMediaStream(); }
+});
+
 async function openMediaStream() {
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
-      // 4:3 uses the full camera sensor. 16:9 cuts off the top and bottom,
-      // which makes the square capture much tighter.
-      video: { facingMode: "user", aspectRatio: { ideal: 4 / 3 }, width: { ideal: 1920 }, height: { ideal: 1440 } },
+      // 4:3 uses the full camera sensor (16:9 cuts it and makes the square tighter).
+      // Ask in the same orientation as the screen: an iPad standing in portrait
+      // must get a tall 3:4 picture, not a sideways landscape strip.
+      video: isPortraitScreen()
+        ? { facingMode: "user", aspectRatio: { ideal: 3 / 4 }, width: { ideal: 1440 }, height: { ideal: 1920 } }
+        : { facingMode: "user", aspectRatio: { ideal: 4 / 3 }, width: { ideal: 1920 }, height: { ideal: 1440 } },
       audio: false
     });
     const v = document.getElementById('studioVideo');
@@ -3685,7 +3732,7 @@ const UI_THEMES = {
     name: 'Racing', note: 'Red · checkered · speed', orn: '#-#-#-#-#-#-#',
     prev: "background:linear-gradient(#e9632b,#f6d18a 60%,#2a2a2f 60%);font-family:'Racing Sans One';font-size:24px;color:#fff;font-style:italic;text-shadow:2px 2px 0 #e10600,4px 4px 0 #111",
     decor: `${CHK('chkA', 20)}<rect width="1180" height="40" fill="url(#chkA)"/><rect y="780" width="1180" height="40" fill="url(#chkA)"/>
-      <g class="big" fill="#7a3b12" opacity=".45"><path d="M0 508 L90 380 L170 440 L260 340 L360 508Z"/><path d="M820 508 L930 360 L1010 420 L1100 330 L1180 400 L1180 508Z"/></g>
+      <g class="big land-only" fill="#7a3b12" opacity=".45"><path d="M0 508 L90 380 L170 440 L260 340 L360 508Z"/><path d="M820 508 L930 360 L1010 420 L1100 330 L1180 400 L1180 508Z"/></g>
       <g class="big" fill="#fff"><rect x="80" y="728" width="160" height="12" rx="6"/><rect x="380" y="728" width="160" height="12" rx="6"/><rect x="680" y="728" width="160" height="12" rx="6"/><rect x="980" y="728" width="160" height="12" rx="6"/></g>
       <g class="big" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"><path d="M60 200 h120"/><path d="M30 240 h170"/><path d="M80 280 h90"/><path d="M1000 160 h130"/><path d="M970 200 h170"/><path d="M1030 240 h90"/></g>`,
     frame: `${CHK('chkB', 15)}<rect width="820" height="24" fill="url(#chkB)"/><rect y="796" width="820" height="24" fill="url(#chkB)"/>`
@@ -3757,7 +3804,14 @@ function applyUiTheme(k) {
   k = uiThemeKey(k);
   const t = UI_THEMES[k];
   document.body.dataset.ui = k;
-  document.getElementById('uiDecor').innerHTML = t.decor ? SVG_OPEN + t.decor + '</svg>' : '';
+  // Landscape: one full-screen picture. Portrait: top half pinned to the top,
+  // bottom half pinned to the bottom, so the corner art is not cut off.
+  const art = (sfx) => t.decor.replace(/id="(\w+)"/g, `id="$1${sfx}"`).replace(/url\(#(\w+)\)/g, `url(#$1${sfx})`);
+  document.getElementById('uiDecor').innerHTML = t.decor
+    ? `<svg class="decor-land" viewBox="0 0 1180 820" preserveAspectRatio="xMidYMid slice">${art('L')}</svg>`
+    + `<svg class="decor-top" viewBox="0 0 1180 410" preserveAspectRatio="xMidYMin meet">${art('T')}</svg>`
+    + `<svg class="decor-bot" viewBox="0 410 1180 410" preserveAspectRatio="xMidYMax meet">${art('B')}</svg>`
+    : '';
   const box = document.querySelector('.square-framing-box');
   if (box) box.innerHTML = t.frame ? FRAME_OPEN + t.frame + '</svg>' : '';
   const orn = document.getElementById('rcptOrnament');
