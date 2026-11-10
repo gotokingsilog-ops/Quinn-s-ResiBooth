@@ -1846,16 +1846,22 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
           </div>
 
           <div class="form-row">
+            <label class="form-label">Event Folder Name</label>
+            <input class="form-input" id="cfgDriveEvent" placeholder="Blank = use the Event Title" autocomplete="off">
+            <div class="form-help">A folder with this name is made automatically inside your main Drive folder. Use a new name for each event (e.g. "Ana &amp; Ben Wedding 2026-12-01"). Press <b>Save</b> and the QR link below fills in by itself.</div>
+          </div>
+
+          <div class="form-row">
             <label class="form-label">QR Code Link (Event Folder)</label>
             <input class="form-input" id="cfgDriveLink" value="https://drive.google.com/drive/folders/resibooth-demo-event">
             <div class="form-help">
-              Encoded into the QR printed on each receipt. Use the public (Anyone with the link) folder link. Works offline.
+              Encoded into the QR printed on each receipt. Filled in automatically from the event folder when Drive upload is on. Works offline.
             </div>
           </div>
 
           <div class="form-row">
             <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button type="button" class="btn-secondary" id="btnDriveTest">Test connection</button>
+              <button type="button" class="btn-secondary" id="btnDriveTest">Test &amp; get folder link</button>
               <button type="button" class="btn-secondary" id="btnDriveRetry">Upload queue now</button>
               <button type="button" class="btn-secondary" id="btnDriveClear">Clear queue</button>
             </div>
@@ -1972,6 +1978,7 @@ const defaultConfig = {
   driveUpload: false,
   driveWebhook: "",
   driveSecret: "",
+  driveEvent: "",   // Drive sub-folder name for this event (blank = event title)
   countdown: 3,
   printLevel: 6.5,  // print brightness 1 (dark) .. 10 (light)
   printWidth: 576,  // dots: 576/512 = 80mm, 384 = 58mm
@@ -2505,6 +2512,7 @@ function loadAdminInputs() {
   document.getElementById('cfgDriveUpload').value = appConfig.driveUpload ? 'true' : 'false';
   document.getElementById('cfgDriveWebhook').value = appConfig.driveWebhook;
   document.getElementById('cfgDriveSecret').value = appConfig.driveSecret;
+  document.getElementById('cfgDriveEvent').value = appConfig.driveEvent || '';
   refreshDriveStatus();
   document.getElementById('cfgCountdownDuration').value = appConfig.countdown;
   document.getElementById('cfgIntervalBetweenShots').value = appConfig.intervalPause;
@@ -2634,6 +2642,7 @@ document.getElementById('btnSaveAdminConfig').onclick = () => {
   appConfig.driveUpload = document.getElementById('cfgDriveUpload').value === 'true';
   appConfig.driveWebhook = document.getElementById('cfgDriveWebhook').value.trim();
   appConfig.driveSecret = document.getElementById('cfgDriveSecret').value.trim();
+  appConfig.driveEvent = document.getElementById('cfgDriveEvent').value.trim();
   appConfig.countdown = parseInt(document.getElementById('cfgCountdownDuration').value, 10);
   appConfig.intervalPause = parseInt(document.getElementById('cfgIntervalBetweenShots').value, 10);
   appConfig.autoResetTime = parseInt(document.getElementById('cfgAutoResetTime').value, 10);
@@ -2642,6 +2651,7 @@ document.getElementById('btnSaveAdminConfig').onclick = () => {
   persistConfig();
   refreshDriveStatus();
   processDriveQueue();
+  syncEventFolderLink();   // creates the event folder (if needed) and fills the QR link
 
   // Sync to Kiosk View
   document.getElementById('eventBadgeText').textContent = appConfig.eventTitle;
@@ -2883,7 +2893,8 @@ async function enqueueSessionUpload() {
     collageUrl = rc.toDataURL('image/jpeg', 0.92);
   } catch (e) { archiveError = 'Could not build collage: ' + ((e && e.message) || e); return; }
   const recs = [{
-    filename: `${tag}_${sid}_receipt.jpg`, sessionId: sid, dataUrl: collageUrl, mime: 'image/jpeg', ts: Date.now()
+    filename: `${tag}_${sid}_receipt.jpg`, sessionId: sid, dataUrl: collageUrl, mime: 'image/jpeg', ts: Date.now(),
+    event: driveEventName()
   }];
 
   // 1) Local archive first (always), then 2) optional folder copy.
@@ -2911,6 +2922,7 @@ async function driveUploadOne(rec) {
     body: JSON.stringify({
       secret: appConfig.driveSecret,
       sessionId: rec.sessionId,
+      event: rec.event || driveEventName(),   // photo goes to the folder of the event it was taken at
       filename: rec.filename,
       mime: rec.mime || 'image/jpeg',
       data: base64
@@ -2944,16 +2956,45 @@ async function processDriveQueue() {
   refreshDriveStatus();
 }
 
+function driveEventName() {
+  return (appConfig.driveEvent || appConfig.eventTitle || '').trim();
+}
+
+// Ask the script for this event's folder (it is created if new) and return { ok, folder, url } .
+async function fetchEventFolder(url, secret, event) {
+  const q = (url.includes('?') ? '&' : '?') + 'secret=' + encodeURIComponent(secret) + '&event=' + encodeURIComponent(event);
+  const r = await fetch(url + q);
+  return r.json();
+}
+
+// After Save: make sure the event folder exists and put its link in the QR.
+async function syncEventFolderLink() {
+  if (!appConfig.driveUpload || !appConfig.driveWebhook || !navigator.onLine) return;
+  const out = document.getElementById('driveTestResult');
+  try {
+    const j = await fetchEventFolder(appConfig.driveWebhook, appConfig.driveSecret, driveEventName());
+    if (!j.ok) { out.textContent = 'Folder not ready: ' + j.error; return; }
+    out.textContent = 'Connected ✓ Event folder: ' + j.folder;
+    if (j.url && j.url !== appConfig.driveUrl) {
+      appConfig.driveUrl = j.url;
+      document.getElementById('cfgDriveLink').value = j.url;
+      persistConfig();
+    }
+  } catch (e) { out.textContent = 'Could not reach the script to get the event folder link.'; }
+}
+
 async function testDriveConnection() {
   const out = document.getElementById('driveTestResult');
   const url = document.getElementById('cfgDriveWebhook').value.trim();
   const secret = document.getElementById('cfgDriveSecret').value.trim();
+  const event = document.getElementById('cfgDriveEvent').value.trim()
+             || document.getElementById('cfgEventTitle').value.trim();
   if (!url) { out.textContent = 'Enter the Web App URL first.'; return; }
   out.textContent = 'Testing…';
   try {
-    const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'secret=' + encodeURIComponent(secret));
-    const j = await r.json();
-    out.textContent = j.ok ? ('Connected ✓ Folder: ' + j.folder) : ('Failed: ' + j.error);
+    const j = await fetchEventFolder(url, secret, event);
+    if (j.ok && j.url) document.getElementById('cfgDriveLink').value = j.url;
+    out.textContent = j.ok ? ('Connected ✓ Event folder: ' + j.folder + ' (link filled in, press Save)') : ('Failed: ' + j.error);
   } catch (e) {
     out.textContent = 'Could not reach the script. Check the URL, that access is set to "Anyone", and the internet connection.';
   }
