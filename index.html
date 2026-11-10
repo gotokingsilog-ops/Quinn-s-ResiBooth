@@ -1848,14 +1848,14 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
           <div class="form-row">
             <label class="form-label">Event Folder Name</label>
             <input class="form-input" id="cfgDriveEvent" placeholder="Blank = use the Event Title" autocomplete="off">
-            <div class="form-help">A folder with this name is made automatically inside your main Drive folder. Use a new name for each event (e.g. "Ana &amp; Ben Wedding 2026-12-01"). Press <b>Save</b> and the QR link below fills in by itself.</div>
+            <div class="form-help">A private folder with this name is made automatically inside your main Drive folder. Use a new name for each event (e.g. "Ana &amp; Ben Wedding 2026-12-01"). Press <b>Save</b> and the QR link below fills in by itself.</div>
           </div>
 
           <div class="form-row">
             <label class="form-label">QR Code Opens</label>
             <select class="form-select" id="cfgQrMode">
-              <option value="photo">This guest's photo only</option>
-              <option value="folder">The whole event folder</option>
+              <option value="photo">This guest's photo only (private)</option>
+              <option value="folder">The whole event folder (everyone sees all photos)</option>
             </select>
             <div class="form-help">"Photo only" needs Drive upload On. The photo appears a few seconds after upload (later if WiFi is down); the page keeps checking by itself.</div>
           </div>
