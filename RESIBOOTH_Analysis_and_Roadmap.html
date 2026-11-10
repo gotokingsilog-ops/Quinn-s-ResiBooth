@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESIBOOTH — Technical Architecture, Gap Analysis & Enhancement Roadmap</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card-bg: #181b24;
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #f0f2f8;
+    --text-muted: #9ba3b5;
+    --accent: #a78bfa;
+    --accent-glow: rgba(167, 139, 250, 0.15);
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-bottom: 12px;
+  }
+  h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+  .subtitle { font-size: 16px; color: var(--text-muted); }
+  
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h3 { font-size: 16px; font-weight: 600; color: var(--accent); margin: 18px 0 8px 0; }
+  p { color: var(--text-muted); margin-bottom: 14px; }
+  ul, ol { margin-left: 20px; color: var(--text-muted); margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+  strong { color: var(--text); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: rgba(167, 139, 250, 0.08);
+    padding: 14px 18px;
+    border-radius: 0 10px 10px 0;
+    margin: 16px 0;
+  }
+  .callout.warning {
+    border-color: var(--warning);
+    background: rgba(251, 191, 36, 0.08);
+  }
+  .callout.danger {
+    border-color: var(--danger);
+    background: rgba(248, 113, 113, 0.08);
+  }
+  .callout.success {
+    border-color: var(--success);
+    background: rgba(52, 211, 153, 0.08);
+  }
+
+  .tag-pill {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .tag-danger { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+  .tag-warning { background: rgba(251, 191, 36, 0.2); color: var(--warning); }
+  .tag-success { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+  th, td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    text-align: left;
+    font-size: 14px;
+  }
+  th { background: rgba(255,255,255,0.04); color: #fff; }
+  code {
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <span class="badge">Business & Architecture Review</span>
+    <h1>RESIBOOTH: Product Review & Technical Roadmap</h1>
+    <p class="subtitle">Analysis of the tablet + thermal receipt photobooth concept, prototype evaluation, and architectural solutions for GitHub Pages & Google Drive integration.</p>
+  </header>
+
+  <!-- Executive Summary -->
+  <section class="card">
+    <h2>1. Executive Verdict: The Concept is Brilliant</h2>
+    <p>
+      The <strong>"Resibooth" (Receipt Photobooth)</strong> concept is high-margin, low-overhead, and culturally trending. Vintage Y2K / monochrome receipt photobooths are immensely popular in cafe pop-ups and events across Asia.
+    </p>
+    <div class="grid-2">
+      <div class="callout success">
+        <strong>Why it wins commercially:</strong>
+        <ul style="margin-top:8px;">
+          <li><strong>Ultra-low consumable cost:</strong> A 50-pack of thermal rolls costs ~$15–$25. Each print costs less than ₱0.50–₱1.00 ($0.01–$0.02), compared to ₱15–₱25 per sheet on dye-sublimation photo paper.</li>
+          <li><strong>Fast & fun:</strong> Thermal printers output in ~2-4 seconds. No ink, no ribbons, no ink drying time.</li>
+          <li><strong>Aesthetic novelty:</strong> The grainy, receipt-style printout with custom receipt details (barcodes, cute "items" like 1x Birthday Love) is highly shareable on Instagram & TikTok.</li>
+        </ul>
+      </div>
+      <div class="callout warning">
+        <strong>Primary risk:</strong>
+        <p style="margin-top:8px;">
+          The hardware & software connection: thermal printers are monochrome 1-bit dot devices. If the software sends normal color photos without <strong>algorithmic dithering</strong>, prints will turn out washed out or solid black blobs.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prototype Review & Gaps -->
+  <section class="card">
+    <h2>2. Current Prototype Gap Analysis</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Area</th>
+          <th>Current State in Prototype</th>
+          <th>Real-World Event Gap</th>
+          <th>Severity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Thermal Dithering</strong></td>
+          <td>Generates standard RGB color JPEG on canvas and sends to browser print.</td>
+          <td>Thermal printers cannot print grayscale; hardware driver will violently threshold colors, producing distorted muddy prints.</td>
+          <td><span class="tag-pill tag-danger">Critical</span></td>
+        </tr>
+        <tr>
+          <td><strong>Google Drive + GitHub Pages</strong></td>
+          <td>Hardcoded placeholder link (<code>example.com</code>).</td>
+          <td>GitHub Pages has no backend. Directly using Google Drive API from the client risks exposing API credentials or getting blocked by OAuth consent screens.</td>
+          <td><span class="tag-pill tag-danger">Critical</span></td>
+        </tr>
+        <tr>
+          <td><strong>Offline QR Generation</strong></td>
+          <td>Uses external API: <code>api.qrserver.com</code>.</td>
+          <td>If venue WiFi is weak or drops, the QR code image will fail to load, breaking the flow for guests.</td>
+          <td><span class="tag-pill tag-danger">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>Kiosk / Attendee Tampering</strong></td>
+          <td>Admin toggle button and navigation are visible on screen.</td>
+          <td>Any attendee can tap "Admin Preview", change settings, or swipe out of the app.</td>
+          <td><span class="tag-pill tag-warning">Medium</span></td>
+        </tr>
+        <tr>
+          <td><strong>Session Auto-Reset</strong></td>
+          <td>No idle timeout.</td>
+          <td>If an attendee walks away mid-capture, the screen stays stuck on that session forever until manually reset.</td>
+          <td><span class="tag-pill tag-warning">Medium</span></td>
+        </tr>
+        <tr>
+          <td><strong>Thermal Printer Communication</strong></td>
+          <td>Relies on <code>window.print()</code> (AirPrint / OS Dialog).</td>
+          <td>Shows an OS dialog asking user to choose printer and pages every single time. Ruins the instant "booth" feel.</td>
+          <td><span class="tag-pill tag-warning">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Solution Architecture -->
+  <section class="card">
+    <h2>3. Recommended Architecture: GitHub Pages + Google Drive</h2>
+    <p>How to store pictures on Google Drive for free without a paid server:</p>
+    
+    <div class="callout success">
+      <h3>The Zero-Cost Architecture: Google Apps Script Webhook</h3>
+      <ol>
+        <li><strong>Frontend:</strong> Hosted on <strong>GitHub Pages</strong> (free, fast, custom domain capable).</li>
+        <li><strong>Backend / Pipe:</strong> A single <strong>Google Apps Script</strong> deployed as a Web App (free, handles Drive API natively).</li>
+        <li><strong>Flow:</strong>
+          <ul>
+            <li>Tablet captures and composites the photo.</li>
+            <li>Tablet immediately triggers thermal print and displays local preview (zero lag for attendees).</li>
+            <li>In the background, tablet sends an asynchronous <code>POST</code> request with the base64 JPEG to the Google Apps Script URL.</li>
+            <li>Apps Script saves the file directly into a designated Google Drive folder for that event.</li>
+            <li>Apps Script sets public read permissions and returns the Google Drive file / web view URL.</li>
+            <li>Tablet generates the QR code pointing directly to that photo or an event gallery.</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    <div class="callout warning">
+      <strong>Pro Tip for Venues with Weak Internet:</strong>
+      <p>
+        Always implement an <strong>IndexedDB offline queue</strong>. If the tablet has no internet at the venue, it should save photos locally on the tablet, print the receipt immediately, and sync all photos to Google Drive once the tablet connects to WiFi back home. The QR code on the receipt can point to a pre-created public Google Drive folder link for the whole event!
+      </p>
+    </div>
+  </section>
+
+  <!-- Technical Roadmap -->
+  <section class="card">
+    <h2>4. Must-Have Feature Upgrades for RESIBOOTH</h2>
+
+    <h3>1. Floyd-Steinberg / Atkinson Dithering Engine</h3>
+    <p>
+      Transform the captured canvas into high-contrast 1-bit dithered art before sending to the printer. This creates the authentic, high-definition "newspaper/receipt" aesthetic and guarantees the thermal printer burns clean, crisp dots.
+    </p>
+
+    <h3>2. Authentic Thermal Receipt Layout Generator</h3>
+    <p>Give prints the beloved receipt styling:</p>
+    <ul>
+      <li><strong>Header:</strong> Event Name / Couple Name, Date & Time, Order / Session # (e.g. <code>#0084</code>).</li>
+      <li><strong>Photos:</strong> Dithered photo strip (2, 3, or 4 cuts).</li>
+      <li><strong>Footer:</strong> Barcode graphic, "Subtotal: 100% Fun", custom thank-you message, and dynamic QR code printed right at the bottom of the receipt!</li>
+    </ul>
+
+    <h3>3. Client-Side QR Code Engine</h3>
+    <p>
+      Replace <code>api.qrserver.com</code> with an embedded client-side QR generator library (like <code>qrcodejs</code> or <code>qrious</code>). QR codes generate in 5 milliseconds, 100% offline.
+    </p>
+
+    <h3>4. True Kiosk Mode & Admin Protection</h3>
+    <ul>
+      <li><strong>PIN or Hidden Gesture:</strong> Hide the Admin button. Only open Admin settings if the user taps the top-left logo 5 times within 2 seconds and enters a 4-digit PIN.</li>
+      <li><strong>Idle Timeout:</strong> If the booth is left untouched on any screen for 45 seconds, smoothly transition back to the Welcome screen.</li>
+      <li><strong>PWA (Progressive Web App):</strong> Add a <code>manifest.json</code> so the client can tap "Add to Home Screen" on iPad/Android. It opens full-screen with no browser address bar or back buttons.</li>
+    </ul>
+
+    <h3>5. Direct Thermal Printing (Web Bluetooth / WebUSB)</h3>
+    <p>
+      Instead of relying on the cumbersome OS print dialog, modern Bluetooth thermal receipt printers can receive ESC/POS raw byte streams directly via the <strong>Web Bluetooth API</strong> (supported in Chrome / Bluefy on iOS). With one tap, the receipt feeds out immediately!
+    </p>
+  </section>
+
+  <!-- Hardware Advice -->
+  <section class="card">
+    <h2>5. Hardware Setup Guide for Rentals</h2>
+    <div class="grid-2">
+      <div>
+        <h3>Thermal Printer Recommendations</h3>
+        <ul>
+          <li><strong>Width:</strong> Prefer <strong>80mm</strong> over 58mm. 80mm gives wide enough room for decent photo strips; 58mm is too narrow for group photos.</li>
+          <li><strong>Connectivity:</strong> Look for Bluetooth + USB (or AirPrint/Mopria compatible if relying on OS print). Brands: Xprinter, Phomemo, Munbyn, Epson TM-T20.</li>
+          <li><strong>Paper:</strong> Use high-density, BPA-free thermal paper rolls. High-density paper yields much darker, sharper black dots.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Tablet & Stand Recommendations</h3>
+        <ul>
+          <li><strong>iPad (9th/10th Gen) or Android Tablet (e.g. Galaxy Tab A9+):</strong> Front camera with good lighting is essential.</li>
+          <li><strong>Lighting:</strong> A mounted ring light or LED softbox next to the tablet. Thermal paper needs good contrast; well-lit photos dither much better than dark photos.</li>
+          <li><strong>Security:</strong> Tablet lock enclosure to prevent theft or power button tampering.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

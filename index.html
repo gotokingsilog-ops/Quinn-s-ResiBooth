@@ -1,0 +1,3197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RESIBOOTH — Vintage Thermal Receipt Photobooth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Modern Flat Design Tokens */
+  --bg-main: #0b0f17;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #1a2234;
+  --bg-subtle: #1e293b;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-focus: #6366f1;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-light: rgba(99, 102, 241, 0.12);
+  --accent-border: #6366f1;
+
+  --status-success: #10b981;
+  --status-success-bg: rgba(16, 185, 129, 0.12);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
+  --status-danger: #ef4444;
+  --status-danger-bg: rgba(239, 68, 68, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Thermal Receipt Mockup Tokens */
+  --thermal-paper: #f8f7f2;
+  --thermal-ink: #111111;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-hand: 'Caveat', cursive;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+}
+
+/* Base button and form elements */
+button, input, select, textarea { font-family: inherit; font-size: 14px; }
+button { cursor: pointer; border: 0; outline: 0; transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
+button:active { transform: scale(0.98); }
+
+/* SVG Icon Helper */
+.icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  flex-shrink: 0;
+}
+.icon-lg { width: 24px; height: 24px; }
+.icon-sm { width: 14px; height: 14px; }
+
+/* Status Chip Component */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.badge-success { background: var(--status-success-bg); color: var(--status-success); border: 1px solid rgba(16, 185, 129, 0.25); }
+.badge-warning { background: var(--status-warning-bg); color: var(--status-warning); border: 1px solid rgba(245, 158, 11, 0.25); }
+.badge-accent { background: var(--accent-light); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); }
+.badge-muted { background: var(--bg-subtle); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+
+/* Master Header / Telemetry Bar */
+.top-bar {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--accent-primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 0 1px var(--border-subtle);
+}
+.brand-text h1 { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+.brand-text span { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.04em; }
+
+.telemetry-cluster {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.telemetry-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+@media (max-width: 768px) {
+  .telemetry-item.hide-mobile { display: none; }
+}
+.btn-admin-gate {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+.btn-admin-gate:hover { color: #fff; border-color: var(--border-strong); background: var(--bg-subtle); }
+
+/* Main Stage Viewports */
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+}
+.stage.standard-container {
+  max-width: 1200px;
+  padding: 24px 20px 48px;
+}
+.stage.wide-container {
+  max-width: 100%;
+  padding: 0;
+}
+
+/* ========================================================== */
+/* BUTTERY-SMOOTH PAGE TRANSITION ANIMATIONS                  */
+/* ========================================================== */
+.view-panel {
+  display: none;
+  width: 100%;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.view-panel.active {
+  display: block;
+}
+
+/* Forward Animation (Slide in from Right) */
+.view-panel.anim-forward {
+  animation: pageSlideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes pageSlideInRight {
+  0% { opacity: 0; transform: translateX(36px) scale(0.985); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Backward Animation (Slide in from Left) */
+.view-panel.anim-backward {
+  animation: pageSlideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes pageSlideInLeft {
+  0% { opacity: 0; transform: translateX(-36px) scale(0.985); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Staggered Floating Entrance for Page Content */
+.view-panel.active .kiosk-welcome-hero,
+.view-panel.active .section-header,
+.view-panel.active .layout-cards-grid,
+.view-panel.active .receipt-scroll-container,
+.view-panel.active .output-panel-sticky {
+  animation: contentFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: 0.05s;
+}
+@keyframes contentFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Flat Enterprise Buttons */
+.btn-primary {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  padding: 14px 28px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  padding: 14px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-secondary:hover { background: var(--bg-subtle); border-color: var(--border-focus); }
+
+/* SCREEN 1: KIOSK WELCOME VIEW */
+.kiosk-welcome-hero {
+  max-width: 820px;
+  margin: 6vh auto 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 64px 40px;
+  text-align: center;
+  position: relative;
+}
+.hero-tagline {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #818cf8;
+  margin-bottom: 12px;
+}
+.hero-title {
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin-bottom: 16px;
+  color: #fff;
+}
+.hero-sub {
+  font-size: 16px;
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+.kiosk-meta-pills {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* SCREEN 2: LAYOUT SELECTOR */
+.section-header {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 36px;
+}
+.section-header h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+.section-header p { color: var(--text-secondary); font-size: 15px; }
+
+.layout-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  max-width: 980px;
+  margin: 0 auto 36px;
+}
+.card-layout-item {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s, background-color 0.15s;
+  position: relative;
+}
+.card-layout-item:hover { border-color: var(--border-strong); background: var(--bg-surface-elevated); }
+.card-layout-item.selected {
+  border-color: var(--accent-border);
+  background: rgba(99, 102, 241, 0.08);
+}
+.layout-schematic {
+  height: 170px;
+  background: #070a10;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding: 12px;
+}
+.mini-receipt-strip {
+  background: var(--thermal-paper);
+  border: 1px solid #000;
+  padding: 6px;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+/* Square mini slot previews */
+.mini-photo-slot {
+  width: 44px;
+  height: 44px;
+  background: #111;
+  border: 1px solid #444;
+}
+.card-item-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.card-item-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+.card-bottom-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ========================================================== */
+/* SCREEN 3: WIDE-SPANNING CAMERA VIEWPORT & BOTTOM SHUTTER   */
+/* ========================================================== */
+.camera-studio-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 65px);
+  min-height: 580px;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Studio Header Overlay Bar */
+.studio-top-overlay {
+  background: rgba(11, 15, 23, 0.85);
+  backdrop-filter: blur(14px);
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+.studio-prompt-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Wide-Spanning Viewfinder Frame */
+.camera-viewfinder {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  background: #05070c;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.camera-viewfinder video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  transform: scaleX(-1);
+}
+
+/* Square Crop Framing Box Overlay (Guides user into 1:1 square) */
+.square-framing-box {
+  position: relative;
+  width: min(75vh, 75vw);
+  aspect-ratio: 1 / 1;
+  border: 2px dashed rgba(255, 255, 255, 0.45);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.square-framing-box::before {
+  content: "1:1 SQUARE PRINT ZONE";
+  position: absolute;
+  top: -24px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0,0,0,0.6);
+  padding: 2px 10px;
+  border-radius: 99px;
+}
+
+.camera-grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 33.33% 33.33%;
+  z-index: 5;
+}
+.studio-countdown-hud {
+  position: absolute;
+  z-index: 20;
+  font-size: clamp(120px, 20vw, 190px);
+  font-weight: 900;
+  font-family: var(--font-sans);
+  color: #fff;
+  display: none;
+  text-shadow: 0 4px 50px rgba(0,0,0,0.9);
+}
+
+/* Intermission Card with Live Progress Bar */
+.studio-intermission-hud {
+  position: absolute;
+  z-index: 20;
+  background: rgba(17, 24, 39, 0.94);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(16px);
+  padding: 24px 38px;
+  border-radius: var(--radius-lg);
+  display: none;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+  min-width: 320px;
+}
+.intermission-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.intermission-sub {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+.intermission-bar-track {
+  height: 6px;
+  background: var(--bg-subtle);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.intermission-bar-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  width: 100%;
+  transition: width 1s linear;
+}
+
+.studio-flash-layer {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 0.1s ease-out;
+}
+
+/* Wide Smartphone-style Bottom Control Deck */
+.camera-bottom-deck {
+  background: rgba(9, 13, 20, 0.94);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px clamp(20px, 4vw, 48px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  z-index: 10;
+}
+
+/* Modern Phone-style Red Shutter Button */
+.shutter-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.camera-red-shutter {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  background: transparent;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s;
+}
+.camera-red-shutter:hover { transform: scale(1.06); border-color: rgba(255,255,255,0.9); }
+.camera-red-shutter:active { transform: scale(0.94); }
+
+.shutter-inner-core {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 4px 18px rgba(239, 68, 68, 0.55);
+  transition: transform 0.15s, border-radius 0.2s, background 0.2s;
+}
+.camera-red-shutter:active .shutter-inner-core {
+  transform: scale(0.9);
+}
+/* When session is automatically capturing */
+.camera-red-shutter.capturing {
+  border-color: #ef4444;
+  pointer-events: none;
+  animation: pulseShutter 1.5s infinite;
+}
+.camera-red-shutter.capturing .shutter-inner-core {
+  border-radius: 12px;
+  transform: scale(0.65);
+}
+@keyframes pulseShutter { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+.shutter-instruction-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+/* Deck flanks: Thumbnail reel & Cancel */
+.deck-flank-left, .deck-flank-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.reel-preview-cluster {
+  display: flex;
+  gap: 8px;
+}
+.mini-reel-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: #151a24;
+  border: 1px solid rgba(255,255,255,0.18);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.mini-reel-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ========================================================== */
+/* SCREEN 4: STICKY ACTIONS & SCROLLABLE THERMAL RECEIPT      */
+/* ========================================================== */
+.output-studio-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) 1fr;
+  gap: 40px;
+  max-width: 1150px;
+  margin: 0 auto;
+  align-items: start;
+  position: relative;
+}
+@media (max-width: 900px) {
+  .output-studio-layout { grid-template-columns: 1fr; justify-items: center; }
+}
+
+/* Scrollable Receipt Column */
+.receipt-scroll-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding: 10px 14px 60px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.receipt-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.receipt-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 99px;
+}
+
+/* REALISTIC HIGH-FIDELITY THERMAL RECEIPT */
+.receipt-wrapper {
+  perspective: 1000px;
+  margin: 0 auto;
+}
+.thermal-sheet {
+  width: 320px;
+  background: var(--thermal-paper);
+  color: var(--thermal-ink);
+  padding: 28px 18px 22px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  position: relative;
+  border-radius: 2px;
+}
+/* Perforated tear lines top and bottom */
+.thermal-sheet::before, .thermal-sheet::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background-size: 12px 8px;
+}
+.thermal-sheet::before {
+  top: -8px;
+  background-image: radial-gradient(circle at 6px 8px, transparent 5px, var(--thermal-paper) 6px);
+}
+.thermal-sheet::after {
+  bottom: -8px;
+  background-image: radial-gradient(circle at 6px 0px, transparent 5px, var(--thermal-paper) 6px);
+}
+
+.rcpt-center { text-align: center; }
+.rcpt-header-title { font-size: 16px; font-weight: 800; letter-spacing: 0.08em; margin-bottom: 2px; }
+.rcpt-header-sub { font-size: 10px; color: #333; margin-bottom: 8px; text-transform: uppercase; }
+.rcpt-divider { border-top: 1px dashed #222; margin: 10px 0; }
+
+.rcpt-tiles-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+/* ========================================================== */
+/* EXPANDED 8 CUSTOM PHOTO TILE FRAME STYLES                  */
+/* ========================================================== */
+
+/* 1. Vintage 35mm Filmstrip */
+.frame-filmstrip {
+  border: 4px solid #000;
+  border-left: 14px solid #000;
+  border-right: 14px solid #000;
+  position: relative;
+  background: #000;
+}
+.frame-filmstrip::before, .frame-filmstrip::after {
+  content: "▪▪▪▪▪▪▪▪";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 8px;
+  writing-mode: vertical-lr;
+  font-size: 8px;
+  color: #fff;
+  letter-spacing: 5px;
+}
+.frame-filmstrip::before { left: -12px; }
+.frame-filmstrip::after { right: -12px; }
+
+/* 2. Postage Stamp Scalloped Edge */
+.frame-postage {
+  border: 2px dotted #000;
+  padding: 6px;
+  background: #fff;
+  outline: 1px solid #000;
+  outline-offset: 2px;
+}
+
+/* 3. Retro Polaroid Chin with Handwritten Caption */
+.frame-polaroid {
+  background: #fff;
+  padding: 6px 6px 22px 6px;
+  border: 1px solid #111;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.frame-polaroid::after {
+  content: "memories ♥ '26";
+  font-family: var(--font-hand);
+  position: absolute;
+  bottom: 2px;
+  right: 10px;
+  font-size: 13px;
+  color: #222;
+}
+
+/* 4. Y2K Sparkle & Star Doodle */
+.frame-y2k {
+  border: 2px dashed #000;
+  border-radius: 14px;
+  padding: 6px;
+  background: #fff;
+  position: relative;
+}
+.frame-y2k::before {
+  content: "✦";
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+}
+.frame-y2k::after {
+  content: "★";
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+}
+
+/* 5. Korean Minimalist & Vintage Timestamp */
+.frame-korean {
+  border: 1px solid #000;
+  padding: 4px;
+  background: #fff;
+  position: relative;
+}
+.frame-korean::after {
+  content: "'26 10 24";
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  background: #000;
+  color: #fff;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+/* 6. Cyberpunk Tech HUD Frame */
+.frame-cyber {
+  border: 2px solid #000;
+  padding: 4px;
+  background: #fff;
+  position: relative;
+}
+.frame-cyber::before {
+  content: "[REC // 01]";
+  position: absolute;
+  top: -8px;
+  left: 6px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  background: #000;
+  color: #fff;
+  padding: 0 4px;
+  font-weight: 800;
+}
+
+/* 7. Birthday Celebration Ribbon Frame */
+.frame-birthday {
+  border: 3px double #000;
+  padding: 6px;
+  background: #fff;
+  position: relative;
+}
+.frame-birthday::before {
+  content: "PARTY MODE 🎉";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-size: 8px;
+  background: #000;
+  color: #fff;
+  padding: 0 6px;
+  font-weight: 800;
+  border-radius: 99px;
+}
+
+/* 8. Classic Clean Double Hairline */
+.frame-classic {
+  border: 2px solid #000;
+  padding: 3px;
+  background: #fff;
+  outline: 1px solid #000;
+  outline-offset: -5px;
+}
+
+.rcpt-tile-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  object-fit: cover;
+}
+
+.barcode-svg {
+  height: 36px;
+  margin: 10px auto 4px;
+  background: repeating-linear-gradient(90deg, #111 0, #111 2px, transparent 2px, transparent 4px, #111 4px, #111 8px, transparent 8px, transparent 11px, #111 11px, #111 14px);
+  width: 80%;
+}
+.qr-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #222;
+}
+.qr-row canvas { width: 64px; height: 64px; border: 1px solid #111; }
+
+/* Sticky Output Control Panel */
+.output-panel-sticky {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 34px;
+  position: sticky;
+  top: 85px;
+  align-self: start;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* ========================================================== */
+/* BACK OFFICE ADMIN & EVENT CONFIGURATION MODAL              */
+/* ========================================================== */
+.admin-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 10, 16, 0.96);
+  backdrop-filter: blur(16px);
+  z-index: 999;
+  overflow-y: auto;
+  padding: 40px 20px;
+}
+.admin-modal.active { display: block; }
+.admin-window {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 80px rgba(0,0,0,0.8);
+  overflow: hidden;
+}
+.admin-top-nav {
+  background: var(--bg-surface-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.admin-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 600px;
+}
+@media (max-width: 820px) {
+  .admin-body { grid-template-columns: 1fr; }
+}
+.admin-sidebar {
+  background: #0d121c;
+  border-right: 1px solid var(--border-subtle);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 13px;
+  text-align: left;
+}
+.sidebar-btn:hover { background: var(--bg-subtle); color: #fff; }
+.sidebar-btn.active {
+  background: var(--accent-light);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.admin-main-area {
+  padding: 32px;
+  overflow-y: auto;
+}
+.admin-tab-pane { display: none; }
+.admin-tab-pane.active { display: block; }
+
+/* Form Fields */
+.form-row { margin-bottom: 20px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: #090d14;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  color: #fff;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+.form-help { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+
+/* Grid preset selector in Admin */
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.preset-card {
+  background: #0c1017;
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.preset-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+.preset-card.active { border-color: var(--border-focus); background: var(--accent-light); }
+.preset-card strong { display: block; font-size: 13px; color: #fff; margin-bottom: 4px; }
+.preset-card span { font-size: 11px; color: var(--text-secondary); }
+
+/* LIVE PREVIEW CONTAINER INSIDE ADMIN TAB 2 */
+.theme-preview-workspace {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 950px) {
+  .theme-preview-workspace { grid-template-columns: 1fr; }
+}
+.live-preview-box {
+  background: #0a0d14;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.preview-tile-card {
+  width: 200px;
+  background: var(--thermal-paper);
+  color: var(--thermal-ink);
+  padding: 12px 10px;
+  border-radius: 2px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-align: center;
+}
+
+/* PIN Prompt Dialog */
+.pin-prompt-box {
+  max-width: 380px;
+  margin: 18vh auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+.pin-code-input {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  letter-spacing: 12px;
+  text-align: center;
+  width: 200px;
+  margin: 20px auto;
+  background: #090d14;
+  border: 2px solid var(--border-subtle);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 10px;
+}
+
+/* ========================================================== */
+/* BRIGHT & PLAYFUL THEME (overrides)                         */
+/* ========================================================== */
+:root {
+  --ink: #2b1b4a;
+  --pink: #ff5c8a;
+  --pink-deep: #e83e72;
+  --yellow: #ffd23f;
+  --mint: #3ddc97;
+  --sky: #4cc9f0;
+  --violet: #7b5cff;
+  --cream: #fff6e8;
+
+  --bg-main: var(--cream);
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #fff0f5;
+  --bg-subtle: #f3eeff;
+  --border-subtle: rgba(43, 27, 74, 0.14);
+  --border-strong: var(--ink);
+  --border-focus: var(--violet);
+
+  --text-primary: var(--ink);
+  --text-secondary: #5b4a7d;
+  --text-muted: #8a7aa8;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: var(--pink);
+  --accent-hover: var(--pink-deep);
+  --accent-light: rgba(255, 210, 63, 0.35);
+  --accent-border: var(--ink);
+
+  --status-success: #0b9a63;
+  --status-success-bg: rgba(61, 220, 151, 0.25);
+  --status-warning: #a35f00;
+  --status-warning-bg: rgba(255, 210, 63, 0.45);
+  --status-danger: #d6264f;
+  --status-danger-bg: rgba(255, 92, 138, 0.2);
+
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --font-display: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+  --pop: 4px 4px 0 var(--ink);
+  --pop-lg: 8px 8px 0 var(--ink);
+}
+
+body {
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255, 92, 138, 0.22) 0 14px, transparent 15px),
+    radial-gradient(circle at 88% 12%, rgba(76, 201, 240, 0.28) 0 22px, transparent 23px),
+    radial-gradient(circle at 78% 82%, rgba(255, 210, 63, 0.40) 0 18px, transparent 19px),
+    radial-gradient(circle at 8% 86%, rgba(123, 92, 255, 0.20) 0 26px, transparent 27px),
+    radial-gradient(rgba(43, 27, 74, 0.10) 1.5px, transparent 1.6px);
+  background-size: auto, auto, auto, auto, 26px 26px;
+  background-attachment: fixed;
+  letter-spacing: 0;
+}
+h1, h2, h3, .hero-title, .section-header h2, .brand-text h1, .intermission-title { font-family: var(--font-display); }
+button:active { transform: translate(2px, 2px); }
+
+/* Buttons */
+.btn-primary {
+  background: var(--pink);
+  color: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: var(--pop);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  padding: 14px 32px;
+  text-shadow: 0 1px 0 rgba(43, 27, 74, 0.35);
+}
+.btn-primary:hover { background: var(--pink-deep); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+.btn-primary:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-primary:disabled { opacity: 0.55; box-shadow: 2px 2px 0 var(--ink); }
+.btn-secondary {
+  background: #fff;
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+}
+.btn-secondary:hover { background: var(--yellow); border-color: var(--ink); }
+.btn-secondary:active { box-shadow: 1px 1px 0 var(--ink); }
+
+/* Badges */
+.badge { border-radius: 999px; font-weight: 700; border: 2px solid var(--ink) !important; }
+.badge-accent { background: var(--yellow); color: var(--ink); }
+.badge-success { background: var(--status-success-bg); color: #066f46; }
+.badge-warning { background: var(--yellow); color: var(--ink); }
+.badge-muted { background: #fff; color: var(--text-secondary); }
+
+/* Top bar */
+.top-bar {
+  background: #fff;
+  border-bottom: 3px solid var(--ink);
+  padding: 10px 24px;
+}
+.brand-mark {
+  background: var(--pink);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--font-display);
+  transform: rotate(-6deg);
+  border-radius: 14px;
+}
+.brand-text h1 { font-size: 18px; letter-spacing: 0.04em; color: var(--ink); }
+.brand-text span { color: var(--violet); font-weight: 700; }
+.btn-admin-gate {
+  background: #fff; color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 999px;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.btn-admin-gate:hover { background: var(--sky); color: var(--ink); border-color: var(--ink); }
+
+/* Welcome hero */
+.kiosk-welcome-hero {
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 40px;
+  box-shadow: var(--pop-lg);
+  overflow: hidden;
+}
+.kiosk-welcome-hero::before {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 0; height: 14px;
+  background: repeating-linear-gradient(90deg, var(--pink) 0 40px, var(--yellow) 40px 80px, var(--sky) 80px 120px, var(--mint) 120px 160px);
+  border-bottom: 3px solid var(--ink);
+}
+.hero-tagline {
+  display: inline-block;
+  color: var(--ink);
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 5px 16px;
+  letter-spacing: 0.12em;
+  margin-top: 10px;
+  transform: rotate(-2deg);
+}
+.hero-title { color: var(--ink); font-weight: 700; letter-spacing: -0.01em; text-shadow: 3px 3px 0 var(--yellow); }
+.hero-sub { color: var(--text-secondary); font-weight: 500; }
+.kiosk-meta-pills { border-top: 3px dashed rgba(43, 27, 74, 0.2); }
+
+/* Layout picker */
+.section-header h2 { color: var(--ink); font-weight: 700; font-size: 38px; text-shadow: 2px 2px 0 var(--yellow); }
+.card-layout-item {
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  box-shadow: var(--pop);
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+.card-layout-item:hover { background: #fff0f5; transform: translate(-2px, -2px) rotate(-0.6deg); box-shadow: 6px 6px 0 var(--ink); border-color: var(--ink); }
+.card-layout-item.selected { background: #fff3c4; border-color: var(--ink); box-shadow: 6px 6px 0 var(--pink); transform: translate(-2px, -2px); }
+.layout-schematic { background: #dff6ff; border: 3px dashed var(--sky); border-radius: 20px; }
+.mini-receipt-strip { border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); border-radius: 4px; }
+.mini-photo-slot { background: var(--violet); border: 2px solid var(--ink); border-radius: 4px; }
+.card-item-title { font-family: var(--font-display); font-size: 20px; color: var(--ink); }
+.card-item-desc { color: var(--text-secondary); font-weight: 500; }
+
+/* Camera screen (keeps a dark viewfinder, with playful chrome) */
+.camera-studio-container { background: var(--ink); }
+.studio-top-overlay {
+  background: rgba(43, 27, 74, 0.88);
+  border-bottom: 3px solid var(--yellow);
+}
+.studio-prompt-text { font-family: var(--font-display); font-size: 17px; }
+.camera-viewfinder { background: #1a0f30; }
+.square-framing-box {
+  border: 4px dashed var(--yellow);
+  border-radius: 28px;
+  box-shadow: 0 0 0 9999px rgba(43, 27, 74, 0.35);
+}
+.square-framing-box::before {
+  content: "SMILE INSIDE THE BOX!";
+  background: var(--yellow); color: var(--ink);
+  border: 2px solid var(--ink);
+  top: -34px; font-size: 12px; padding: 4px 14px;
+}
+.studio-countdown-hud {
+  color: var(--yellow);
+  font-family: var(--font-display);
+  -webkit-text-stroke: 6px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 8px 8px 0 var(--pink);
+}
+.studio-intermission-hud {
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 28px;
+  box-shadow: var(--pop-lg);
+  backdrop-filter: none;
+}
+.intermission-title { color: var(--ink); }
+.intermission-sub { color: var(--text-secondary); }
+.intermission-bar-track { background: #f3eeff; border: 2px solid var(--ink); height: 14px; }
+.intermission-bar-fill { background: repeating-linear-gradient(45deg, var(--pink) 0 12px, var(--yellow) 12px 24px); }
+.camera-bottom-deck {
+  background: rgba(43, 27, 74, 0.92);
+  border-top: 3px solid var(--yellow);
+}
+.camera-red-shutter { border: 5px solid #fff; box-shadow: 0 0 0 3px var(--ink); }
+.shutter-inner-core { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); box-shadow: 0 4px 18px rgba(255, 92, 138, 0.6); }
+.camera-red-shutter.capturing { border-color: var(--yellow); }
+.shutter-instruction-label { color: var(--yellow); font-weight: 800; }
+.mini-reel-thumb { border: 2px solid var(--yellow); background: rgba(255, 255, 255, 0.1); border-radius: 12px; color: #d9cff0; }
+.camera-bottom-deck .btn-secondary { background: #fff; }
+
+/* Output screen */
+.output-panel-sticky {
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 36px;
+  box-shadow: var(--pop-lg);
+}
+.output-panel-sticky h2 { font-family: var(--font-display); color: var(--ink); font-size: 30px !important; text-shadow: 2px 2px 0 var(--yellow); }
+.receipt-scroll-container {
+  background: repeating-linear-gradient(135deg, rgba(255, 210, 63, 0.18) 0 14px, transparent 14px 28px);
+  border: 3px dashed rgba(43, 27, 74, 0.25);
+  border-radius: 28px;
+  scrollbar-color: var(--pink) transparent;
+}
+.receipt-scroll-container::-webkit-scrollbar-thumb { background: var(--pink); }
+.thermal-sheet { box-shadow: 6px 8px 0 rgba(43, 27, 74, 0.25), 0 0 0 2px var(--ink); transform: rotate(-0.6deg); }
+#printStatus { font-weight: 700; }
+
+/* Admin console */
+.admin-modal { background: rgba(43, 27, 74, 0.72); backdrop-filter: blur(6px); }
+.admin-window {
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 32px;
+  box-shadow: var(--pop-lg);
+}
+.admin-top-nav { background: var(--yellow); border-bottom: 3px solid var(--ink); color: var(--ink); }
+.admin-top-nav * { color: var(--ink); }
+.admin-sidebar { background: #f3eeff; border-right: 3px solid var(--ink); }
+.sidebar-btn { color: var(--ink); border: 2px solid transparent; border-radius: 999px; font-weight: 700; }
+.sidebar-btn:hover { background: #fff; color: var(--ink); }
+.sidebar-btn.active { background: var(--pink); color: #fff; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.admin-main-area { background: #fffdf8; }
+.admin-main-area h1, .admin-main-area h2, .admin-main-area h3 { font-family: var(--font-display); color: var(--ink); }
+.form-label { color: var(--ink); font-weight: 800; }
+.form-input, .form-select, .form-textarea {
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  font-weight: 500;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--violet); box-shadow: 0 0 0 4px rgba(123, 92, 255, 0.25); }
+.form-help { color: var(--text-muted); }
+input[type="range"] { accent-color: var(--pink); height: 28px; }
+.preset-card { background: #fff; border: 3px solid var(--ink); border-radius: 20px; box-shadow: 3px 3px 0 var(--ink); }
+.preset-card:hover { border-color: var(--ink); transform: translate(-1px, -2px); box-shadow: 5px 5px 0 var(--ink); }
+.preset-card.active { background: #fff3c4; border-color: var(--ink); box-shadow: 4px 4px 0 var(--pink); }
+.preset-card strong { color: var(--ink); font-family: var(--font-display); font-size: 15px; }
+.preset-card span { color: var(--text-secondary); }
+.live-preview-box { background: #dff6ff; border: 3px dashed var(--sky); border-radius: 24px; }
+.preview-tile-card { box-shadow: 4px 4px 0 var(--ink); border: 2px solid var(--ink); }
+.pin-prompt-box { background: #fff; border: 4px solid var(--ink); border-radius: 32px; box-shadow: var(--pop-lg); }
+.pin-prompt-box * { color: var(--ink); }
+.pin-code-input { background: #fff8e0; color: var(--ink); border: 3px solid var(--ink); border-radius: 18px; }
+.admin-modal .btn-primary { color: #fff; }
+
+@media (max-width: 768px) {
+  .hero-title { font-size: 36px; }
+  .section-header h2 { font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-layout-item, .btn-primary, .btn-secondary { transition: none; }
+}
+@media print {
+  .thermal-sheet { transform: none !important; box-shadow: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP TELEMETRY BAR -->
+<header class="top-bar">
+  <div class="brand-cluster" id="brandTrigger" title="Tap 5x for Admin Console">
+    <div class="brand-mark">R</div>
+    <div class="brand-text">
+      <h1>RESIBOOTH</h1>
+      <span>PHOTOBOOTH STUDIO</span>
+    </div>
+  </div>
+
+  <div class="telemetry-cluster">
+    <div class="telemetry-item hide-mobile">
+      <span class="badge badge-accent" id="eventBadgeText">KIM & LEO'S WEDDING</span>
+    </div>
+    <div class="telemetry-item hide-mobile">
+      <span class="pulse-dot" id="cloudDot" style="color:var(--text-muted)"></span>
+      <span id="cloudStatusText" style="font-size:11px;font-weight:600;color:var(--text-muted)">CLOUD DRIVE OFF</span>
+    </div>
+    <div class="telemetry-item">
+      <span class="pulse-dot" style="color:var(--status-success)"></span>
+      <span style="font-size:11px;font-weight:700;color:var(--ink)">80MM THERMAL ONLINE</span>
+    </div>
+    <button class="btn-admin-gate" id="openAdminBtn">
+      <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+      Admin
+    </button>
+  </div>
+</header>
+
+<main class="stage standard-container" id="mainStage">
+  <!-- VIEW 1: KIOSK WELCOME SCREEN -->
+  <section class="view-panel active anim-forward" id="viewWelcome">
+    <div class="kiosk-welcome-hero">
+      <div class="hero-tagline" id="heroEventTag">VINTAGE THERMAL PHOTOBOOTH</div>
+      <h2 class="hero-title" id="heroEventTitle">Kim & Leo's Wedding</h2>
+      <p class="hero-sub" id="heroWelcomeDesc">
+        Step up, strike a pose, and take home an authentic thermal receipt keepsake with your photos and digital download link!
+      </p>
+      
+      <button class="btn-primary" id="btnTouchToStart" style="font-size:17px;padding:18px 42px">
+        <span>TOUCH TO START</span>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+
+      <div class="kiosk-meta-pills">
+        <span class="badge badge-muted">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14" rx="1"/></svg>
+          Instant Receipt Print
+        </span>
+        <span class="badge badge-muted">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+          Google Drive QR Sync
+        </span>
+        <span class="badge badge-muted">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          1-Bit Dithered Dot Matrix
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 2: LAYOUT SELECTOR -->
+  <section class="view-panel" id="viewLayout">
+    <div class="section-header">
+      <div class="hero-tagline">Step 1 of 3</div>
+      <h2>Select Your Layout</h2>
+      <p>Choose your preferred photo composition for the continuous thermal roll.</p>
+    </div>
+
+    <div class="layout-cards-grid">
+      <div class="card-layout-item selected" data-layout="strip-3" data-count="3">
+        <div class="layout-schematic">
+          <div class="mini-receipt-strip">
+            <div class="mini-photo-slot"></div>
+            <div class="mini-photo-slot"></div>
+            <div class="mini-photo-slot"></div>
+          </div>
+        </div>
+        <div class="card-item-title">3-Photo Strip</div>
+        <div class="card-item-desc">3 square poses composed vertically with custom frames.</div>
+        <div class="card-bottom-row">
+          <span class="badge badge-muted">3 POSES (1:1 SQUARE)</span>
+          <span class="badge badge-accent">POPULAR</span>
+        </div>
+      </div>
+
+      <div class="card-layout-item" data-layout="strip-2" data-count="2">
+        <div class="layout-schematic">
+          <div class="mini-receipt-strip">
+            <div class="mini-photo-slot"></div>
+            <div class="mini-photo-slot"></div>
+          </div>
+        </div>
+        <div class="card-item-title">2-Photo Duo</div>
+        <div class="card-item-desc">Fast two-shot square keepsake, ideal for duos and couples.</div>
+        <div class="card-bottom-row">
+          <span class="badge badge-muted">2 POSES (1:1 SQUARE)</span>
+        </div>
+      </div>
+
+      <div class="card-layout-item" data-layout="single" data-count="1">
+        <div class="layout-schematic">
+          <div class="mini-receipt-strip">
+            <div class="mini-photo-slot" style="height:70px;width:70px"></div>
+          </div>
+        </div>
+        <div class="card-item-title">Single Portrait</div>
+        <div class="card-item-desc">One high-impact vintage framed square portrait.</div>
+        <div class="card-bottom-row">
+          <span class="badge badge-muted">1 POSE (1:1 SQUARE)</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:14px">
+      <button class="btn-secondary" id="btnLayoutBack">← Back</button>
+      <button class="btn-primary" id="btnLayoutConfirm">
+        <span>Proceed to Studio</span>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- VIEW 3: WIDE-SPANNING STUDIO WITH PHONE-STYLE SHUTTER      -->
+  <!-- ========================================================== -->
+  <section class="view-panel" id="viewCamera">
+    <div class="camera-studio-container">
+      <!-- Studio Top Overlay Bar -->
+      <div class="studio-top-overlay">
+        <div class="studio-prompt-text" id="studioPromptHeading">
+          <span class="pulse-dot" style="color:#ef4444"></span>
+          <span id="studioHeaderStatus">1-Tap Auto Capture · 3 Poses</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="badge badge-accent" id="badgeIntervalInfo">6s Pose Interval</span>
+          <span class="badge badge-muted" id="studioSequenceBadge">Ready</span>
+        </div>
+      </div>
+
+      <!-- Live Lens Viewfinder (Expands Wide Edge-to-Edge) -->
+      <div class="camera-viewfinder">
+        <video id="studioVideo" autoplay playsinline muted></video>
+        <!-- The Square Framing Box shows guests the exact square print crop! -->
+        <div class="square-framing-box"></div>
+        <div class="camera-grid-lines"></div>
+        <div class="studio-countdown-hud" id="studioCountdown">3</div>
+        
+        <!-- Upgraded Intermission Card with Live Countdown & Progress Bar -->
+        <div class="studio-intermission-hud" id="studioIntermission">
+          <div class="intermission-title" id="intermissionTitle">CHANGE YOUR POSE!</div>
+          <div class="intermission-sub" id="intermissionSub">Next photo capturing in 6 seconds...</div>
+          <div class="intermission-bar-track">
+            <div class="intermission-bar-fill" id="intermissionFill"></div>
+          </div>
+        </div>
+
+        <div class="studio-flash-layer" id="studioFlash"></div>
+      </div>
+
+      <!-- Smartphone-style Wide Bottom Control Deck -->
+      <div class="camera-bottom-deck">
+        <!-- Flank Left: Thumbnails reel -->
+        <div class="deck-flank-left">
+          <div class="reel-preview-cluster" id="bottomReelPreview">
+            <!-- Thumbnail slots populated via JS -->
+          </div>
+        </div>
+
+        <!-- Center: Iconic Red Camera Shutter Button -->
+        <div class="shutter-btn-wrapper">
+          <button class="camera-red-shutter" id="btnCameraShutter" title="Tap once to start automatic photo session">
+            <div class="shutter-inner-core"></div>
+          </button>
+          <span class="shutter-instruction-label" id="shutterLabelText">TAP TO CAPTURE</span>
+        </div>
+
+        <!-- Flank Right: Cancel Button -->
+        <div class="deck-flank-right">
+          <button class="btn-secondary" id="btnStudioCancel" style="padding:10px 18px;font-size:13px">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- VIEW 4: STICKY ACTIONS & SCROLLABLE THERMAL RECEIPT        -->
+  <!-- ========================================================== -->
+  <section class="view-panel" id="viewOutput">
+    <div class="output-studio-layout">
+      <!-- Scrollable Left Column: The Thermal Receipt -->
+      <div class="receipt-scroll-container">
+        <div class="receipt-wrapper">
+          <div class="thermal-sheet" id="renderedReceipt">
+            <div class="rcpt-center">
+              <div style="font-size:9px;letter-spacing:4px">★ ★ ★ ★ ★</div>
+              <div class="rcpt-header-title" id="rcptEventTitle">KIM & LEO'S WEDDING</div>
+              <div class="rcpt-header-sub" id="rcptEventSub">OCTOBER 24, 2026 · TAGAYTAY</div>
+              <div class="rcpt-divider"></div>
+              <div style="display:flex;justify-content:space-between;font-size:10px">
+                <span>TERMINAL: RESI-01</span>
+                <span id="rcptSessionNo">#0042</span>
+              </div>
+              <div class="rcpt-divider"></div>
+            </div>
+
+            <!-- Dithered Photo Tiles (1:1 Perfect Square Crops!) -->
+            <div class="rcpt-tiles-column" id="rcptTilesReel">
+              <!-- Populated via Center-Crop Canvas Dithering -->
+            </div>
+
+            <div class="rcpt-divider"></div>
+            <div style="font-size:10px" id="rcptLineItems">
+              <div style="display:flex;justify-content:space-between"><span>1x LOVE & LAUGHTER</span><span>FREE</span></div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px"><span>1x SWEET SMILE</span><span>100%</span></div>
+            </div>
+            <div class="rcpt-divider"></div>
+
+            <div class="rcpt-center">
+              <p id="rcptFooterNote" style="font-size:9px;font-weight:bold;margin-bottom:6px">THANK YOU FOR CELEBRATING WITH US!</p>
+              <div class="barcode-svg"></div>
+              <div style="font-size:9px;letter-spacing:3px">* 8 2 0 4 9 1 7 4 *</div>
+
+              <div class="qr-row">
+                <canvas id="rcptQrCode" width="64" height="64"></canvas>
+                <div style="text-align:left;font-size:9px;line-height:1.25">
+                  <b>SCAN FOR DIGITAL COPY</b><br>
+                  <span style="color:#333">Full-res photos saved to<br>event Google Drive</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: STICKY Output Control Panel -->
+      <div class="output-panel-sticky">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="hero-tagline">Session Complete</div>
+          <span class="badge badge-warning" id="autoResetPill">AUTO-RESET IN 45S</span>
+        </div>
+        <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px">Your Receipt Is Ready</h2>
+        <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:24px">
+          Tap the button below to feed your custom thermal receipt from the printer. Scan the QR code on the paper with your smartphone to download the high-resolution original images.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <button class="btn-primary" id="btnOutputPrint" style="font-size:16px;padding:18px">
+            <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M6 9V4h12v5"/><rect width="12" height="8" x="6" y="14" rx="1"/></svg>
+            <span>PRINT THERMAL RECEIPT</span>
+          </button>
+
+          <button class="btn-secondary" id="btnOutputFinish">
+            Finished · Return to Welcome
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ========================================================== -->
+<!-- BACK OFFICE ADMIN & EVENT CONFIGURATION MODAL              -->
+<!-- ========================================================== -->
+<div class="admin-modal" id="adminModalView">
+  <!-- PIN Gate Dialog -->
+  <div class="pin-prompt-box" id="pinGateView">
+    <div class="brand-mark" style="margin:0 auto 16px;width:44px;height:44px;font-size:18px">R</div>
+    <h3 style="font-size:20px;margin-bottom:6px">Terminal Settings</h3>
+    <p style="color:var(--text-secondary);font-size:13px">Enter 4-digit security PIN to unlock event configuration</p>
+    <input type="password" maxlength="4" class="pin-code-input" id="adminPinInput" placeholder="••••">
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn-secondary" id="btnCancelPin">Cancel</button>
+      <button class="btn-primary" id="btnSubmitPin">Unlock Console</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:16px">Default PIN: 1234</div>
+  </div>
+
+  <!-- Unlocked Admin Dashboard -->
+  <div class="admin-window" id="unlockedAdminWindow" style="display:none">
+    <div class="admin-top-nav">
+      <div>
+        <div class="hero-tagline" style="margin-bottom:2px">Event Back Office</div>
+        <h2 style="font-size:18px;font-weight:800">RESIBOOTH Terminal Management</h2>
+      </div>
+      <button class="btn-secondary" id="btnCloseAdminConsole" style="padding:8px 16px;font-size:13px">
+        ✕ Exit Console
+      </button>
+    </div>
+
+    <div class="admin-body">
+      <!-- Admin Sidebar Navigation -->
+      <nav class="admin-sidebar">
+        <button class="sidebar-btn active" data-tab="tabEvent">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+          1. Event Details
+        </button>
+        <button class="sidebar-btn" data-tab="tabTemplate">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          2. Theme & Frames
+        </button>
+        <button class="sidebar-btn" data-tab="tabReceipt">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/></svg>
+          3. Receipt Items
+        </button>
+        <button class="sidebar-btn" data-tab="tabCloud">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          4. Google Drive & QR
+        </button>
+        <button class="sidebar-btn" data-tab="tabKiosk">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M12 18h.01"/></svg>
+          5. Timing & Interval
+        </button>
+      </nav>
+
+      <!-- Admin Main Forms Area -->
+      <div class="admin-main-area">
+        <!-- TAB 1: EVENT DETAILS -->
+        <div class="admin-tab-pane active" id="tabEvent">
+          <div class="form-row">
+            <label class="form-label">Client / Event Name</label>
+            <input class="form-input" id="cfgEventTitle" value="KIM & LEO'S WEDDING">
+            <div class="form-help">Displayed on the welcome screen and header of all printed receipts.</div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Date & Venue Tagline</label>
+            <input class="form-input" id="cfgEventTagline" value="OCTOBER 24, 2026 · TAGAYTAY">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Attendee Welcome Copy</label>
+            <textarea class="form-textarea" rows="3" id="cfgEventWelcome">Step up, strike a pose, and take home an authentic thermal receipt keepsake with your photos and digital download link!</textarea>
+          </div>
+        </div>
+
+        <!-- TAB 2: THEME & TILE FRAMES WITH INTERACTIVE LIVE PREVIEW -->
+        <div class="admin-tab-pane" id="tabTemplate">
+          <div class="theme-preview-workspace">
+            <div>
+              <label class="form-label">Event Theme Presets (8 Available)</label>
+              <div class="presets-grid">
+                <div class="preset-card active" data-theme="wedding">
+                  <strong>Wedding Keepsake</strong>
+                  <span>Postage scalloped edge & romantic table</span>
+                </div>
+                <div class="preset-card" data-theme="filmstrip">
+                  <strong>Vintage Filmstrip</strong>
+                  <span>35mm analog film sprockets on flanks</span>
+                </div>
+                <div class="preset-card" data-theme="polaroid">
+                  <strong>Retro Polaroid</strong>
+                  <span>White chin & cursive photo sign</span>
+                </div>
+                <div class="preset-card" data-theme="y2k">
+                  <strong>Y2K Pop Retro</strong>
+                  <span>Dashed frames & sparkle stars</span>
+                </div>
+                <div class="preset-card" data-theme="korean">
+                  <strong>Korean Minimalist</strong>
+                  <span>Clean hairline & vintage timestamp</span>
+                </div>
+                <div class="preset-card" data-theme="cyber">
+                  <strong>Cyberpunk HUD</strong>
+                  <span>Tech brackets & digital telemetry</span>
+                </div>
+                <div class="preset-card" data-theme="birthday">
+                  <strong>Birthday Bash</strong>
+                  <span>Party ribbons, bunting & confetti</span>
+                </div>
+                <div class="preset-card" data-theme="classic">
+                  <strong>Double Classic</strong>
+                  <span>Editorial luxury double outline</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">Frame Border Style Override</label>
+                <select class="form-select" id="cfgTileFrameSelect">
+                  <option value="frame-postage">Postage Stamp Scalloped Edge</option>
+                  <option value="frame-filmstrip">Vintage 35mm Filmstrip (with Sprocket Holes)</option>
+                  <option value="frame-polaroid">Retro Polaroid (Thick Chin + Script)</option>
+                  <option value="frame-y2k">Y2K Dashed Frame (with Sparkle Stars)</option>
+                  <option value="frame-korean">Korean Minimalist (with Date Stamp)</option>
+                  <option value="frame-cyber">Cyberpunk HUD Frame</option>
+                  <option value="frame-birthday">Birthday Bash Party Frame</option>
+                  <option value="frame-classic">Double Hairline Outline</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">Thermal Dithering Algorithm</label>
+                <select class="form-select" id="cfgDitherSelect">
+                  <option value="true">Floyd-Steinberg 1-Bit Error Diffusion (Recommended for Thermal)</option>
+                  <option value="false">Raw Grayscale</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">Print Brightness: <b id="cfgPrintLevelVal">6.5</b> / 10</label>
+                <input type="range" id="cfgPrintLevel" min="1" max="10" step="0.5" value="6.5" style="width:100%">
+                <div class="form-help">Higher = lighter print. Raise it if faces look too dark on paper; lower it if the print looks washed out. The preview on the right shows the print tone.</div>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">Paper Width</label>
+                <select class="form-select" id="cfgPrintWidth">
+                  <option value="576">80mm paper (576 dots)</option>
+                  <option value="512">80mm paper, narrow (512 dots)</option>
+                  <option value="384">58mm paper (384 dots)</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <button type="button" class="btn-secondary" id="btnTestPrint" style="width:100%">Print Test Strip</button>
+                <div class="form-help" id="testPrintStatus">Prints a sample strip using the current slider and width (unsaved values are used).</div>
+              </div>
+            </div>
+
+            <!-- LIVE PREVIEW BOX -->
+            <div class="live-preview-box">
+              <span class="badge badge-accent" style="margin-bottom:12px">LIVE TILE PREVIEW</span>
+              <div class="preview-tile-card">
+                <div style="font-size:8px;font-weight:800;letter-spacing:1px;margin-bottom:6px" id="prevCardEventTitle">KIM & LEO'S WEDDING</div>
+                
+                <!-- Dynamic Tile Frame Container -->
+                <div id="prevTileFrameWrap" class="frame-postage">
+                  <canvas id="adminSampleCanvas" width="200" height="200" style="width:100%;aspect-ratio:1/1;display:block"></canvas>
+                </div>
+
+                <div style="margin-top:8px;font-size:7px;color:#444">1:1 THERMAL PRINT CROP</div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-top:12px;text-align:center">
+                Updates in real time as you click presets!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: RECEIPT ITEMS & BARCODE -->
+        <div class="admin-tab-pane" id="tabReceipt">
+          <div class="form-row">
+            <label class="form-label">Session ID Prefix</label>
+            <input class="form-input" id="cfgSessionStart" value="#0042">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Receipt Line Item 1</label>
+            <input class="form-input" id="cfgLine1" value="1x LOVE & LAUGHTER ...... FREE">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Receipt Line Item 2</label>
+            <input class="form-input" id="cfgLine2" value="1x SWEET SMILE .......... 100%">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Receipt Footer Message</label>
+            <input class="form-input" id="cfgFooterNote" value="THANK YOU FOR CELEBRATING WITH US!">
+          </div>
+        </div>
+
+        <!-- TAB 4: CLOUD STORAGE & QR -->
+        <div class="admin-tab-pane" id="tabCloud">
+          <div class="form-row">
+            <label class="form-label">Upload Photos to Drive</label>
+            <select class="form-select" id="cfgDriveUpload">
+              <option value="false">Off (QR code only)</option>
+              <option value="true">On (upload every session in the background)</option>
+            </select>
+            <div class="form-help">Receipts always print first. Uploads never slow the guest down, and are queued on the tablet if WiFi drops.</div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Apps Script Web App URL</label>
+            <input class="form-input" id="cfgDriveWebhook" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+            <div class="form-help">See <b>google-drive/SETUP.md</b>. Deploy the script as a Web app (Execute as: Me, Access: Anyone) and paste the /exec URL.</div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Shared Secret</label>
+            <input type="password" class="form-input" id="cfgDriveSecret" placeholder="Same value as SECRET in the script" autocomplete="off">
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">QR Code Link (Event Folder)</label>
+            <input class="form-input" id="cfgDriveLink" value="https://drive.google.com/drive/folders/resibooth-demo-event">
+            <div class="form-help">
+              Encoded into the QR printed on each receipt. Use the public (Anyone with the link) folder link. Works offline.
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button type="button" class="btn-secondary" id="btnDriveTest">Test connection</button>
+              <button type="button" class="btn-secondary" id="btnDriveRetry">Upload queue now</button>
+              <button type="button" class="btn-secondary" id="btnDriveClear">Clear queue</button>
+            </div>
+            <div id="driveTestResult" class="form-help" style="margin-top:10px">Connection not tested yet.</div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Upload Status</label>
+            <div class="live-preview-box" style="align-items:flex-start;gap:6px;font-size:13px;font-weight:600">
+              <div>Waiting in queue: <b id="driveQueueCount">0</b></div>
+              <div>Uploaded this tablet: <b id="driveUploadedCount">0</b></div>
+              <div>Last error: <span id="driveLastError">none</span></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Local Photo Archive (always on)</label>
+            <div class="live-preview-box" style="align-items:flex-start;gap:6px;font-size:13px;font-weight:600">
+              <div>Photos kept on this tablet: <b id="archiveCount">0</b></div>
+              <div>Backup folder: <span id="archiveFolder">not set</span></div>
+              <div>Last error: <span id="archiveError">none</span></div>
+            </div>
+            <div class="form-help">Every session is saved here before it is uploaded, and is never deleted automatically (not after upload, not by "Clear queue"). Choose a backup folder to also write each photo to disk. Avoid clearing browser site data.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+              <button type="button" class="btn-secondary" id="btnArchiveFolder">Choose backup folder</button>
+              <button type="button" class="btn-secondary" id="btnArchiveSave">Save all to folder</button>
+              <button type="button" class="btn-secondary" id="btnArchiveDownload">Download all photos</button>
+            </div>
+            <div id="archiveResult" class="form-help" style="margin-top:10px"></div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Settings Backup</label>
+            <div class="form-help">Settings are stored per browser and per address (opening the file directly and opening it from localhost do NOT share settings). Export once and import on any other browser or address.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+              <button type="button" class="btn-secondary" id="btnCfgExport">Export settings</button>
+              <button type="button" class="btn-secondary" id="btnCfgImport">Import settings</button>
+              <input type="file" id="cfgImportFile" accept="application/json" style="display:none">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: TIMING & CONFIGURABLE INTERVAL SETTINGS -->
+        <div class="admin-tab-pane" id="tabKiosk">
+          <div class="form-row">
+            <label class="form-label">Camera Countdown per Shot</label>
+            <select class="form-select" id="cfgCountdownDuration">
+              <option value="3">3 Seconds</option>
+              <option value="5" selected>5 Seconds (Recommended)</option>
+              <option value="7">7 Seconds</option>
+            </select>
+            <div class="form-help">Countdown time before the camera flashes and captures each photo.</div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Interval Pause Between Multi-Shots (Pose Change Time)</label>
+            <select class="form-select" id="cfgIntervalBetweenShots">
+              <option value="3">3 Seconds (Fast Solo)</option>
+              <option value="4">4 Seconds</option>
+              <option value="5">5 Seconds (Comfortable Standard)</option>
+              <option value="6" selected>6 Seconds (Recommended for Events)</option>
+              <option value="8">8 Seconds (Relaxed / Group Pose Time)</option>
+              <option value="10">10 Seconds (Props & Large Groups)</option>
+              <option value="12">12 Seconds (Extra Generous)</option>
+            </select>
+            <div class="form-help">Gives guests enough time to laugh, switch poses, grab props, or swap places before the next shot starts!</div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Inactivity Auto-Reset Timer</label>
+            <select class="form-select" id="cfgAutoResetTime">
+              <option value="45">45 Seconds</option>
+              <option value="60">60 Seconds</option>
+              <option value="90">90 Seconds</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Admin Security PIN</label>
+            <input type="password" maxlength="4" class="form-input" id="cfgAdminPinCode" value="1234">
+          </div>
+        </div>
+
+        <div style="margin-top:32px;display:flex;gap:12px">
+          <button class="btn-primary" id="btnSaveAdminConfig" style="flex:1">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Save & Apply Configuration</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Embedded Client-Side QR Engine (Offline Ready) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+<script>
+/* ========================================================== */
+/* STATE & CONFIGURATION (WITH LOCALSTORAGE PERSISTENCE)       */
+/* ========================================================== */
+const defaultConfig = {
+  eventTitle: "KIM & LEO'S WEDDING",
+  eventTagline: "OCTOBER 24, 2026 · TAGAYTAY",
+  welcomeDesc: "Step up, strike a pose, and take home an authentic thermal receipt keepsake with your photos and digital download link!",
+  theme: "wedding",
+  tileFrame: "frame-postage",
+  dithering: true,
+  sessionPrefix: "#0042",
+  line1: "1x LOVE & LAUGHTER ...... FREE",
+  line2: "1x SWEET SMILE .......... 100%",
+  footerNote: "THANK YOU FOR CELEBRATING WITH US!",
+  driveUrl: "https://drive.google.com/drive/folders/resibooth-demo-event",
+  driveUpload: false,
+  driveWebhook: "",
+  driveSecret: "",
+  countdown: 3,
+  printLevel: 6.5,  // print brightness 1 (dark) .. 10 (light)
+  printWidth: 576,  // dots: 576/512 = 80mm, 384 = 58mm
+  intervalPause: 6, // Upgraded default: 6 generous seconds
+  autoResetTime: 45,
+  adminPin: "1234"
+};
+
+let appConfig = loadConfig();
+
+function loadConfig() {
+  try {
+    const saved = localStorage.getItem('resibooth_cfg');
+    if (saved) return { ...defaultConfig, ...JSON.parse(saved) };
+  } catch (e) {}
+  return { ...defaultConfig };
+}
+
+function persistConfig() {
+  // Saved in two places (localStorage + IndexedDB mirror) so one being wiped does not lose the Drive setup.
+  try {
+    localStorage.setItem('resibooth_cfg', JSON.stringify(appConfig));
+  } catch (e) {
+    alert('WARNING: settings could not be saved in this browser (' + e + '). Use Export settings and keep the file.');
+  }
+  try { metaSet('cfg', JSON.parse(JSON.stringify(appConfig))).catch(() => {}); } catch (e) {}
+}
+
+const viewSequence = ['viewWelcome', 'viewLayout', 'viewCamera', 'viewOutput'];
+let currentActiveView = 'viewWelcome';
+let currentLayout = "strip-3";
+let requiredShots = 3;
+let sessionImages = [];
+let mediaStream = null;
+let resetTimer = null;
+let resetCountdownRemaining = 45;
+let isAutoCapturing = false;
+
+/* ========================================================== */
+/* AUDIO SYNTHESIZER (Pure Web Audio API - Zero External Files)*/
+/* ========================================================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playBeep(freq = 880, duration = 0.08) {
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {}
+}
+
+function playShutterClick() {
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const bufferSize = audioCtx.sampleRate * 0.05;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 1000;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    noise.start();
+  } catch (e) {}
+}
+
+/* ========================================================== */
+/* VIEW NAVIGATION CONTROLLER WITH SMOOTH SLIDE ANIMATIONS    */
+/* ========================================================== */
+function switchView(targetViewId) {
+  const currentIndex = viewSequence.indexOf(currentActiveView);
+  const targetIndex = viewSequence.indexOf(targetViewId);
+  const isForward = targetIndex >= currentIndex;
+
+  const stage = document.getElementById('mainStage');
+  // Toggle wide container for the camera studio view
+  if (targetViewId === 'viewCamera') {
+    stage.classList.remove('standard-container');
+    stage.classList.add('wide-container');
+  } else {
+    stage.classList.remove('wide-container');
+    stage.classList.add('standard-container');
+  }
+
+  // Deactivate all panels and clean animation classes
+  document.querySelectorAll('.view-panel').forEach(panel => {
+    panel.classList.remove('active', 'anim-forward', 'anim-backward');
+  });
+
+  // Activate target panel with directional slide animation
+  const targetPanel = document.getElementById(targetViewId);
+  targetPanel.classList.add('active');
+  targetPanel.classList.add(isForward ? 'anim-forward' : 'anim-backward');
+  currentActiveView = targetViewId;
+
+  if (targetViewId !== 'viewCamera') {
+    closeMediaStream();
+    isAutoCapturing = false;
+  }
+
+  clearInterval(resetTimer);
+  if (targetViewId === 'viewOutput') {
+    resetCountdownRemaining = appConfig.autoResetTime;
+    document.getElementById('autoResetPill').textContent = `AUTO-RESET IN ${resetCountdownRemaining}S`;
+    resetTimer = setInterval(() => {
+      resetCountdownRemaining--;
+      document.getElementById('autoResetPill').textContent = `AUTO-RESET IN ${resetCountdownRemaining}S`;
+      if (resetCountdownRemaining <= 0) {
+        clearInterval(resetTimer);
+        abortSession();
+      }
+    }, 1000);
+  }
+}
+
+function abortSession() {
+  sessionImages = [];
+  isAutoCapturing = false;
+  clearInterval(resetTimer);
+  switchView('viewWelcome');
+}
+
+/* ========================================================== */
+/* CAMERA HARDWARE & CAPTURE ENGINE                           */
+/* ========================================================== */
+async function openMediaStream() {
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+    document.getElementById('studioVideo').srcObject = mediaStream;
+  } catch (err) {
+    console.warn("Live camera device not connected. Falling back to synthetic portrait generation.");
+  }
+}
+
+function closeMediaStream() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+    mediaStream = null;
+  }
+}
+
+function makeSyntheticPortrait(index) {
+  // Generate square 480x480 test portrait
+  const c = document.createElement('canvas');
+  c.width = 480; c.height = 480;
+  const ctx = c.getContext('2d');
+  const palette = [345, 215, 38, 160];
+  const hue = palette[index % palette.length];
+
+  const grad = ctx.createLinearGradient(0, 0, 480, 480);
+  grad.addColorStop(0, `hsl(${hue}, 40%, 82%)`);
+  grad.addColorStop(1, `hsl(${hue}, 50%, 35%)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 480, 480);
+
+  ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+  ctx.beginPath(); ctx.arc(240, 180, 85, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(240, 430, 150, 130, 0, Math.PI, Math.PI*2); ctx.fill();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 22px 'Plus Jakarta Sans', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`RESIBOOTH STUDIO · POSE ${index + 1}`, 240, 440);
+  return c.toDataURL("image/jpeg", 0.92);
+}
+
+/* 
+  CENTER-CROP ENGINE: Crops camera frames into 1:1 Square with ZERO distortion.
+  Faces are never squished, warped, or elongated!
+*/
+function getCaptureFrame() {
+  const vid = document.getElementById('studioVideo');
+  if (mediaStream && vid.videoWidth) {
+    const sw = vid.videoWidth;
+    const sh = vid.videoHeight;
+    // Calculate square crop based on smaller dimension
+    const minDim = Math.min(sw, sh);
+    const sx = (sw - minDim) / 2;
+    const sy = (sh - minDim) / 2;
+
+    const c = document.createElement('canvas');
+    c.width = 600;
+    c.height = 600; // Exact 1:1 Square
+    const ctx = c.getContext('2d');
+    
+    // Mirror front camera
+    ctx.translate(c.width, 0);
+    ctx.scale(-1, 1);
+    
+    // Crop center square without warping
+    ctx.drawImage(vid, sx, sy, minDim, minDim, 0, 0, 600, 600);
+    return c.toDataURL("image/jpeg", 0.94);
+  }
+  return makeSyntheticPortrait(sessionImages.length);
+}
+
+/* ========================================================== */
+/* AUTOMATIC 1-TAP MULTI-SHOT SEQUENCE CONTROLLER             */
+/* ========================================================== */
+async function startAutomaticMultiShotSession() {
+  if (isAutoCapturing) return;
+  isAutoCapturing = true;
+
+  const shutter = document.getElementById('btnCameraShutter');
+  shutter.classList.add('capturing');
+  document.getElementById('shutterLabelText').textContent = "RECORDING...";
+
+  const visor = document.getElementById('studioCountdown');
+  const intermission = document.getElementById('studioIntermission');
+  const intermissionSub = document.getElementById('intermissionSub');
+  const intermissionFill = document.getElementById('intermissionFill');
+  const flash = document.getElementById('studioFlash');
+
+  sessionImages = [];
+  renderBottomReel();
+
+  for (let poseIndex = 0; poseIndex < requiredShots; poseIndex++) {
+    if (!isAutoCapturing) break; // Check if cancelled
+
+    // 1. Update UI Status for current pose
+    document.getElementById('studioHeaderStatus').textContent = `Pose ${poseIndex + 1} of ${requiredShots} · Strike a pose!`;
+    document.getElementById('studioSequenceBadge').textContent = `POSE ${poseIndex + 1}/${requiredShots}`;
+
+    // 2. Countdown sequence (True 1000ms ticks)
+    visor.style.display = "block";
+    for (let count = appConfig.countdown; count > 0; count--) {
+      if (!isAutoCapturing) break;
+      visor.textContent = count;
+      playBeep(count === 1 ? 1200 : 880, 0.08);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    if (!isAutoCapturing) break;
+
+    // Flash & Shutter Sound
+    visor.textContent = "✦";
+    playShutterClick();
+    flash.style.opacity = '1';
+    setTimeout(() => flash.style.opacity = '0', 200);
+    await new Promise(r => setTimeout(r, 200));
+    visor.style.display = "none";
+
+    // Capture the 1:1 square frame
+    const captured = getCaptureFrame();
+    sessionImages.push(captured);
+    renderBottomReel();
+
+    // 3. If there are more poses to go, show the configurable intermission countdown!
+    if (poseIndex < requiredShots - 1) {
+      intermission.style.display = "block";
+      const totalInterval = appConfig.intervalPause;
+      intermissionFill.style.transition = 'none';
+      intermissionFill.style.width = '100%';
+      // Force repaint
+      void intermissionFill.offsetWidth;
+      intermissionFill.style.transition = `width ${totalInterval}s linear`;
+      intermissionFill.style.width = '0%';
+
+      for (let sec = totalInterval; sec > 0; sec--) {
+        if (!isAutoCapturing) break;
+        intermissionSub.textContent = `Get ready for pose ${poseIndex + 2} in ${sec} second${sec>1?'s':''}!`;
+        playBeep(440, 0.04);
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      intermission.style.display = "none";
+    }
+  }
+
+  shutter.classList.remove('capturing');
+  document.getElementById('shutterLabelText').textContent = "TAP TO CAPTURE";
+
+  if (isAutoCapturing && sessionImages.length >= requiredShots) {
+    document.getElementById('studioHeaderStatus').textContent = "Session Complete · Processing Receipt...";
+    await new Promise(r => setTimeout(r, 500));
+    closeMediaStream();
+    composeFinalReceipt();
+    enqueueSessionUpload();
+    switchView('viewOutput');
+  }
+  isAutoCapturing = false;
+}
+
+function renderBottomReel() {
+  const container = document.getElementById('bottomReelPreview');
+  container.innerHTML = Array.from({ length: requiredShots }, (_, i) => {
+    return `<div class="mini-reel-thumb">${sessionImages[i] ? `<img src="${sessionImages[i]}">` : `${i+1}`}</div>`;
+  }).join('');
+}
+
+/* ========================================================== */
+/* FLOYD-STEINBERG THERMAL DITHERING ENGINE (1:1 SQUARE)      */
+/* ========================================================== */
+function processDither(imgObj, size, forPrint) {
+  const targetSize = size || 400; // Perfect 1:1 Square Canvas
+  const c = document.createElement('canvas');
+  c.width = targetSize;
+  c.height = targetSize;
+  const ctx = c.getContext('2d');
+
+  // Center-crop drawing: ensures any photo drawn onto canvas preserves 1:1 ratio with no warping
+  const sw = imgObj.naturalWidth || imgObj.width;
+  const sh = imgObj.naturalHeight || imgObj.height;
+  const minDim = Math.min(sw, sh);
+  const sx = (sw - minDim) / 2;
+  const sy = (sh - minDim) / 2;
+
+  ctx.drawImage(imgObj, sx, sy, minDim, minDim, 0, 0, targetSize, targetSize);
+
+  if (!appConfig.dithering && !forPrint) return c.toDataURL('image/png');
+
+  const imgData = ctx.getImageData(0, 0, targetSize, targetSize);
+  const data = imgData.data;
+
+  // Grayscale & thermal contrast enhancement
+  if (forPrint) {
+    // Print tone curve: thermal dots bleed and print darker than the screen.
+    // 1) grayscale, 2) auto-levels (2%-98%), 3) gamma lift on midtones, 4) gentle contrast.
+    const n = data.length / 4, hist = new Uint32Array(256), gray = new Float32Array(n);
+    for (let i = 0, k = 0; i < data.length; i += 4, k++) {
+      const v = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+      gray[k] = v; hist[v | 0]++;
+    }
+    let acc = 0, lo = 0, hi = 255;
+    for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= n * 0.02) { lo = v; break; } }
+    acc = 0;
+    for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= n * 0.02) { hi = v; break; } }
+    const range = Math.max(40, hi - lo);
+    const gamma = 1 - (appConfig.printLevel || 6.5) * 0.07;   // lower gamma = brighter
+    for (let i = 0, k = 0; i < data.length; i += 4, k++) {
+      let t = Math.max(0, Math.min(1, (gray[k] - lo) / range));
+      t = Math.pow(t, gamma);
+      t = (t - 0.5) * 1.1 + 0.5;
+      data[i] = data[i+1] = data[i+2] = Math.max(0, Math.min(255, t * 255));
+    }
+  } else {
+    for (let i = 0; i < data.length; i += 4) {
+      let gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+      gray = (gray - 128) * 1.35 + 128;
+      data[i] = data[i+1] = data[i+2] = Math.max(0, Math.min(255, gray));
+    }
+  }
+
+  // Error diffusion
+  const w = targetSize, h = targetSize;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = (y * w + x) * 4;
+      const oldVal = data[idx];
+      const newVal = oldVal < (forPrint ? 128 : 135) ? 0 : 255;
+      data[idx] = data[idx+1] = data[idx+2] = newVal;
+      const err = oldVal - newVal;
+
+      if (x + 1 < w) data[(y * w + (x + 1)) * 4] += (err * 7) / 16;
+      if (x - 1 >= 0 && y + 1 < h) data[((y + 1) * w + (x - 1)) * 4] += (err * 3) / 16;
+      if (y + 1 < h) data[((y + 1) * w + x) * 4] += (err * 5) / 16;
+      if (x + 1 < w && y + 1 < h) data[((y + 1) * w + (x + 1)) * 4] += (err * 1) / 16;
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  return c.toDataURL('image/png');
+}
+
+/* ========================================================== */
+/* THERMAL RECEIPT COMPOSITOR (1:1 SQUARE TILES)              */
+/* ========================================================== */
+function composeFinalReceipt() {
+  document.getElementById('rcptEventTitle').textContent = appConfig.eventTitle;
+  document.getElementById('rcptEventSub').textContent = appConfig.eventTagline;
+  document.getElementById('rcptSessionNo').textContent = appConfig.sessionPrefix;
+  document.getElementById('rcptFooterNote').textContent = appConfig.footerNote;
+
+  document.getElementById('rcptLineItems').innerHTML = `
+    <div style="display:flex;justify-content:space-between"><span>${appConfig.line1}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-top:2px"><span>${appConfig.line2}</span></div>
+  `;
+
+  const reel = document.getElementById('rcptTilesReel');
+  reel.innerHTML = '';
+
+  sessionImages.forEach(src => {
+    const wrap = document.createElement('div');
+    wrap.className = appConfig.tileFrame;
+
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      const dithered = processDither(img);
+      const node = document.createElement('img');
+      node.className = 'rcpt-tile-image';
+      node.src = dithered;
+      wrap.appendChild(node);
+    };
+    reel.appendChild(wrap);
+  });
+
+  // Generate offline QR Code
+  try {
+    new QRious({
+      element: document.getElementById('rcptQrCode'),
+      value: appConfig.driveUrl,
+      size: 64
+    });
+  } catch (err) {
+    console.error("QR library error:", err);
+  }
+}
+
+/* ========================================================== */
+/* ADMIN AUTHENTICATION & PIN MANAGEMENT                      */
+/* ========================================================== */
+let tapCount = 0;
+let tapTimer = null;
+
+document.getElementById('brandTrigger').onclick = () => {
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(() => tapCount = 0, 1800);
+  if (tapCount >= 5) {
+    tapCount = 0;
+    promptAdminPin();
+  }
+};
+
+document.getElementById('openAdminBtn').onclick = promptAdminPin;
+
+function promptAdminPin() {
+  document.getElementById('adminModalView').classList.add('active');
+  document.getElementById('pinGateView').style.display = 'block';
+  document.getElementById('unlockedAdminWindow').style.display = 'none';
+  document.getElementById('adminPinInput').value = '';
+  document.getElementById('adminPinInput').focus();
+}
+
+document.getElementById('btnCancelPin').onclick = () => {
+  document.getElementById('adminModalView').classList.remove('active');
+};
+
+document.getElementById('btnSubmitPin').onclick = verifyAdminPin;
+document.getElementById('adminPinInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') verifyAdminPin();
+});
+
+function verifyAdminPin() {
+  const pin = document.getElementById('adminPinInput').value;
+  if (pin === appConfig.adminPin) {
+    document.getElementById('pinGateView').style.display = 'none';
+    document.getElementById('unlockedAdminWindow').style.display = 'block';
+    loadAdminInputs();
+    renderAdminLivePreview();
+  } else {
+    alert("Unauthorized PIN. Access Denied.");
+    document.getElementById('adminPinInput').value = '';
+  }
+}
+
+document.getElementById('btnCloseAdminConsole').onclick = () => {
+  document.getElementById('adminModalView').classList.remove('active');
+};
+
+/* ========================================================== */
+/* ADMIN TABS & PRESETS & LIVE THEME PREVIEW ENGINE           */
+/* ========================================================== */
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'tabTemplate') {
+      renderAdminLivePreview();
+    }
+  };
+});
+
+function renderAdminLivePreview() {
+  const currentFrame = document.getElementById('cfgTileFrameSelect').value;
+  const wrap = document.getElementById('prevTileFrameWrap');
+  wrap.className = currentFrame;
+  document.getElementById('prevCardEventTitle').textContent = document.getElementById('cfgEventTitle').value || appConfig.eventTitle;
+
+  // Draw sample dithered portrait on the admin sample canvas
+  const cvs = document.getElementById('adminSampleCanvas');
+  const ctx = cvs.getContext('2d');
+  const tempImg = new Image();
+  tempImg.src = makeSyntheticPortrait(0);
+  tempImg.onload = () => {
+    const ditheredData = processDither(tempImg, 400, true);
+    const ditheredImg = new Image();
+    ditheredImg.src = ditheredData;
+    ditheredImg.onload = () => {
+      ctx.clearRect(0, 0, 200, 200);
+      ctx.drawImage(ditheredImg, 0, 0, 200, 200);
+    };
+  };
+}
+
+function loadAdminInputs() {
+  document.getElementById('cfgEventTitle').value = appConfig.eventTitle;
+  document.getElementById('cfgEventTagline').value = appConfig.eventTagline;
+  document.getElementById('cfgEventWelcome').value = appConfig.welcomeDesc;
+  document.getElementById('cfgTileFrameSelect').value = appConfig.tileFrame;
+  document.getElementById('cfgDitherSelect').value = appConfig.dithering ? "true" : "false";
+  document.getElementById('cfgPrintLevel').value = appConfig.printLevel;
+  document.getElementById('cfgPrintLevelVal').textContent = appConfig.printLevel;
+  document.getElementById('cfgPrintWidth').value = String(appConfig.printWidth);
+  document.getElementById('cfgSessionStart').value = appConfig.sessionPrefix;
+  document.getElementById('cfgLine1').value = appConfig.line1;
+  document.getElementById('cfgLine2').value = appConfig.line2;
+  document.getElementById('cfgFooterNote').value = appConfig.footerNote;
+  document.getElementById('cfgDriveLink').value = appConfig.driveUrl;
+  document.getElementById('cfgDriveUpload').value = appConfig.driveUpload ? 'true' : 'false';
+  document.getElementById('cfgDriveWebhook').value = appConfig.driveWebhook;
+  document.getElementById('cfgDriveSecret').value = appConfig.driveSecret;
+  refreshDriveStatus();
+  document.getElementById('cfgCountdownDuration').value = appConfig.countdown;
+  document.getElementById('cfgIntervalBetweenShots').value = appConfig.intervalPause;
+  document.getElementById('cfgAutoResetTime').value = appConfig.autoResetTime;
+  document.getElementById('cfgAdminPinCode').value = appConfig.adminPin;
+
+  // Highlight active theme preset
+  document.querySelectorAll('.preset-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.theme === appConfig.theme);
+  });
+}
+
+// 8 Themed Preset Configurations
+const themePresets = {
+  wedding: {
+    frame: 'frame-postage',
+    line1: '1x LOVE & LAUGHTER ...... FREE',
+    line2: '1x SWEET SMILE .......... 100%',
+    footer: 'THANK YOU FOR CELEBRATING WITH US!'
+  },
+  filmstrip: {
+    frame: 'frame-filmstrip',
+    line1: '3x 35MM RETRO POSES .... OK',
+    line2: '1x ANALOG GRAIN ........ 100%',
+    footer: 'PRINTED ON CONTINUOUS THERMAL ROLL'
+  },
+  polaroid: {
+    frame: 'frame-polaroid',
+    line1: '1x INSTANT SQUARE ...... FREE',
+    line2: '1x TIMELESS MOMENT ..... 100%',
+    footer: 'ORIGINAL POLAROID KEEPSAKE'
+  },
+  y2k: {
+    frame: 'frame-y2k',
+    line1: '1x DANCE PASS .......... FREE',
+    line2: '1x GLITTER LEVEL ....... 1000%',
+    footer: 'KEEP SHINING · EST 2026'
+  },
+  korean: {
+    frame: 'frame-korean',
+    line1: '1x COFFEE & FRIENDS .... ₱0.00',
+    line2: '1x PURE HAPPINESS ...... ₱0.00',
+    footer: 'SEOUL PHOTO STUDIO POPUP'
+  },
+  cyber: {
+    frame: 'frame-cyber',
+    line1: '1x NEURAL LINK DATA .... 100%',
+    line2: '1x CYBER MATRIX PASS ... OK',
+    footer: 'RESIBOOTH // TECH TERMINAL'
+  },
+  birthday: {
+    frame: 'frame-birthday',
+    line1: '1x BIRTHDAY CHEERS ..... FREE',
+    line2: '1x CAKE & HAPPINESS .... 100%',
+    footer: 'HAPPY BIRTHDAY! BEST WISHES!'
+  },
+  classic: {
+    frame: 'frame-classic',
+    line1: '1x VIP ACCESS .......... FREE',
+    line2: '1x SPECIAL EDITION ..... 100%',
+    footer: 'PREMIUM PHOTOBOOTH COLLECTION'
+  }
+};
+
+document.querySelectorAll('.preset-card').forEach(card => {
+  card.onclick = () => {
+    document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    const t = card.dataset.theme;
+    appConfig.theme = t;
+
+    const data = themePresets[t];
+    if (data) {
+      document.getElementById('cfgTileFrameSelect').value = data.frame;
+      document.getElementById('cfgLine1').value = data.line1;
+      document.getElementById('cfgLine2').value = data.line2;
+      document.getElementById('cfgFooterNote').value = data.footer;
+    }
+    renderAdminLivePreview();
+  };
+});
+
+document.getElementById('cfgTileFrameSelect').onchange = renderAdminLivePreview;
+document.getElementById('cfgDitherSelect').onchange = () => {
+  appConfig.dithering = document.getElementById('cfgDitherSelect').value === "true";
+  renderAdminLivePreview();
+};
+
+document.getElementById('cfgPrintLevel').oninput = () => {
+  const v = parseFloat(document.getElementById('cfgPrintLevel').value);
+  document.getElementById('cfgPrintLevelVal').textContent = v;
+  appConfig.printLevel = v;          // live (saved permanently on Save)
+  renderAdminLivePreview();
+};
+document.getElementById('cfgPrintWidth').onchange = () => {
+  appConfig.printWidth = parseInt(document.getElementById('cfgPrintWidth').value, 10);
+};
+document.getElementById('btnTestPrint').onclick = async () => {
+  const st = document.getElementById('testPrintStatus');
+  const saved = sessionImages;
+  try {
+    st.textContent = 'Printing test strip…';
+    sessionImages = [makeSyntheticPortrait(0), makeSyntheticPortrait(1), makeSyntheticPortrait(2)];
+    appConfig.printWidth = parseInt(document.getElementById('cfgPrintWidth').value, 10);
+    await printReceiptDirect(false);
+    st.textContent = 'Test strip printed ✓';
+  } catch (err) {
+    st.textContent = 'Test print failed: ' + (err.message || err);
+  } finally {
+    sessionImages = saved;
+  }
+};
+
+document.getElementById('btnSaveAdminConfig').onclick = () => {
+  appConfig.printLevel = parseFloat(document.getElementById('cfgPrintLevel').value);
+  appConfig.printWidth = parseInt(document.getElementById('cfgPrintWidth').value, 10);
+  appConfig.eventTitle = document.getElementById('cfgEventTitle').value.trim() || "A SPECIAL EVENT";
+  appConfig.eventTagline = document.getElementById('cfgEventTagline').value.trim();
+  appConfig.welcomeDesc = document.getElementById('cfgEventWelcome').value.trim();
+  appConfig.tileFrame = document.getElementById('cfgTileFrameSelect').value;
+  appConfig.dithering = document.getElementById('cfgDitherSelect').value === "true";
+  appConfig.sessionPrefix = document.getElementById('cfgSessionStart').value.trim() || "#0001";
+  appConfig.line1 = document.getElementById('cfgLine1').value.trim();
+  appConfig.line2 = document.getElementById('cfgLine2').value.trim();
+  appConfig.footerNote = document.getElementById('cfgFooterNote').value.trim();
+  appConfig.driveUrl = document.getElementById('cfgDriveLink').value.trim();
+  appConfig.driveUpload = document.getElementById('cfgDriveUpload').value === 'true';
+  appConfig.driveWebhook = document.getElementById('cfgDriveWebhook').value.trim();
+  appConfig.driveSecret = document.getElementById('cfgDriveSecret').value.trim();
+  appConfig.countdown = parseInt(document.getElementById('cfgCountdownDuration').value, 10);
+  appConfig.intervalPause = parseInt(document.getElementById('cfgIntervalBetweenShots').value, 10);
+  appConfig.autoResetTime = parseInt(document.getElementById('cfgAutoResetTime').value, 10);
+  appConfig.adminPin = document.getElementById('cfgAdminPinCode').value.trim() || "1234";
+
+  persistConfig();
+  refreshDriveStatus();
+  processDriveQueue();
+
+  // Sync to Kiosk View
+  document.getElementById('eventBadgeText').textContent = appConfig.eventTitle;
+  document.getElementById('heroEventTitle').textContent = appConfig.eventTitle;
+  document.getElementById('heroWelcomeDesc').textContent = appConfig.welcomeDesc;
+  document.getElementById('badgeIntervalInfo').textContent = `${appConfig.intervalPause}s Pose Interval`;
+
+  document.getElementById('adminModalView').classList.remove('active');
+  alert("Configuration updated and saved to tablet memory!");
+};
+
+/* ========================================================== */
+/* KIOSK INTERACTION BINDINGS                                 */
+/* ========================================================== */
+document.getElementById('btnTouchToStart').onclick = () => switchView('viewLayout');
+document.getElementById('btnLayoutBack').onclick = () => switchView('viewWelcome');
+
+document.querySelectorAll('.card-layout-item').forEach(card => {
+  card.onclick = () => {
+    document.querySelectorAll('.card-layout-item').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    currentLayout = card.dataset.layout;
+    requiredShots = parseInt(card.dataset.count, 10);
+  };
+});
+
+document.getElementById('btnLayoutConfirm').onclick = () => {
+  sessionImages = [];
+  document.getElementById('studioHeaderStatus').textContent = `1-Tap Auto Capture · ${requiredShots} Pose${requiredShots>1?'s':''}`;
+  document.getElementById('studioSequenceBadge').textContent = `Ready · ${requiredShots} Shots`;
+  document.getElementById('badgeIntervalInfo').textContent = `${appConfig.intervalPause}s Pose Interval`;
+  renderBottomReel();
+  openMediaStream();
+  switchView('viewCamera');
+};
+
+// Shutter Button Event Listener (1-Tap Auto Burst)
+document.getElementById('btnCameraShutter').onclick = startAutomaticMultiShotSession;
+
+document.getElementById('btnStudioCancel').onclick = () => {
+  isAutoCapturing = false;
+  abortSession();
+};
+
+document.getElementById('btnOutputFinish').onclick = abortSession;
+
+
+/* ========================================================== */
+/* GOOGLE DRIVE UPLOAD (APPS SCRIPT + OFFLINE QUEUE)          */
+/* ========================================================== */
+const DRIVE_DB = 'resibooth_uploads';
+let driveBusy = false;
+let driveLastError = '';
+
+function driveDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(DRIVE_DB, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('q', { keyPath: 'id', autoIncrement: true });
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function dbTx(mode, fn) {
+  const db = await driveDb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('q', mode);
+    const out = fn(tx.objectStore('q'));
+    tx.oncomplete = () => { db.close(); res(out && out.result !== undefined ? out.result : undefined); };
+    tx.onerror = () => { db.close(); rej(tx.error); };
+  });
+}
+const driveCount = () => dbTx('readonly', st => st.count());
+const driveAll = () => dbTx('readonly', st => st.getAll());
+const driveDel = id => dbTx('readwrite', st => st.delete(id));
+const driveClear = () => dbTx('readwrite', st => st.clear());
+const driveAdd = rec => dbTx('readwrite', st => st.add(rec));
+
+function driveUploaded() { return parseInt(localStorage.getItem('resibooth_uploaded') || '0', 10); }
+
+async function refreshDriveStatus() {
+  let n = 0;
+  try { n = await driveCount(); } catch (e) {}
+  const q = document.getElementById('driveQueueCount');
+  if (q) {
+    q.textContent = n;
+    document.getElementById('driveUploadedCount').textContent = driveUploaded();
+    document.getElementById('driveLastError').textContent = driveLastError || 'none';
+  }
+  const t = document.getElementById('cloudStatusText'), d = document.getElementById('cloudDot');
+  if (!t) return;
+  let txt, col;
+  if (!appConfig.driveUpload) { txt = 'CLOUD DRIVE OFF'; col = 'var(--text-muted)'; }
+  else if (!navigator.onLine) { txt = 'OFFLINE · ' + n + ' QUEUED'; col = 'var(--status-warning)'; }
+  else if (driveLastError) { txt = 'DRIVE ERROR · ' + n + ' QUEUED'; col = 'var(--status-danger)'; }
+  else if (n > 0) { txt = 'UPLOADING · ' + n + ' LEFT'; col = 'var(--status-warning)'; }
+  else { txt = 'CLOUD DRIVE READY'; col = 'var(--status-success)'; }
+  t.textContent = txt; t.style.color = col; d.style.color = col;
+}
+
+/* ---- Permanent local archive --------------------------------------------
+   Every captured session is saved on the tablet FIRST, independent of the
+   Drive setting. Unlike the upload queue, archived photos are never deleted
+   automatically (not after upload, not by "Clear queue"). Optionally they are
+   also written to a folder on disk (Admin > Google Drive & QR > Backup folder). */
+const ARCHIVE_DB = 'resibooth_archive';
+let archiveError = '';
+
+function archDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(ARCHIVE_DB, 1);
+    r.onupgradeneeded = () => {
+      r.result.createObjectStore('photos', { keyPath: 'id', autoIncrement: true });
+      r.result.createObjectStore('meta');
+    };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function archTx(store, mode, fn) {
+  const db = await archDb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, mode);
+    const out = fn(tx.objectStore(store));
+    tx.oncomplete = () => { db.close(); res(out && out.result !== undefined ? out.result : undefined); };
+    tx.onerror = tx.onabort = () => { db.close(); rej(tx.error); };
+  });
+}
+const archiveAdd = rec => archTx('photos', 'readwrite', st => st.add(rec));
+const archiveCount = () => archTx('photos', 'readonly', st => st.count());
+const archiveAll = () => archTx('photos', 'readonly', st => st.getAll());
+const metaGet = k => archTx('meta', 'readonly', st => st.get(k));
+const metaSet = (k, v) => archTx('meta', 'readwrite', st => st.put(v, k));
+
+async function dataUrlToBlob(u) { return (await fetch(u)).blob(); }
+
+// Writes one photo into the chosen backup folder. Returns true only if written.
+async function writeToBackupFolder(rec) {
+  try {
+    const h = await metaGet('dirHandle');
+    if (!h) return false;
+    if ((await h.queryPermission({ mode: 'readwrite' })) !== 'granted') return false;
+    const fh = await h.getFileHandle(rec.filename, { create: true });
+    const w = await fh.createWritable();
+    await w.write(await dataUrlToBlob(rec.dataUrl));
+    await w.close();
+    return true;
+  } catch (e) { archiveError = 'Backup folder: ' + ((e && e.message) || e); return false; }
+}
+
+async function refreshArchiveStatus() {
+  const n = document.getElementById('archiveCount');
+  if (!n) return;
+  try { n.textContent = await archiveCount(); } catch (e) { n.textContent = '?'; }
+  let folder = 'not set';
+  try {
+    const h = await metaGet('dirHandle');
+    if (h) folder = h.name + ((await h.queryPermission({ mode: 'readwrite' })) === 'granted' ? ' (active)' : ' (needs re-allow: press Choose / Save all)');
+  } catch (e) {}
+  document.getElementById('archiveFolder').textContent = folder;
+  document.getElementById('archiveError').textContent = archiveError || 'none';
+}
+
+async function chooseBackupFolder() {
+  if (!window.showDirectoryPicker) { alert('This browser cannot save to a folder. Use "Download all photos" instead.'); return; }
+  try {
+    const h = await window.showDirectoryPicker({ mode: 'readwrite' });
+    await metaSet('dirHandle', h);
+    archiveError = '';
+    await saveAllToFolder();
+  } catch (e) { if (e && e.name !== 'AbortError') archiveError = String((e && e.message) || e); }
+  refreshArchiveStatus();
+}
+
+async function saveAllToFolder() {
+  const h = await metaGet('dirHandle');
+  if (!h) { await chooseBackupFolder(); return; }
+  if ((await h.queryPermission({ mode: 'readwrite' })) !== 'granted' &&
+      (await h.requestPermission({ mode: 'readwrite' })) !== 'granted') { archiveError = 'Folder permission not granted'; refreshArchiveStatus(); return; }
+  let ok = 0;
+  for (const rec of await archiveAll()) if (await writeToBackupFolder(rec)) ok++;
+  document.getElementById('archiveResult').textContent = `Saved ${ok} photo(s) to folder "${h.name}".`;
+  refreshArchiveStatus();
+}
+
+async function downloadAllArchive() {
+  const all = await archiveAll();
+  if (!all.length) { document.getElementById('archiveResult').textContent = 'Nothing archived yet.'; return; }
+  for (const rec of all) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await dataUrlToBlob(rec.dataUrl));
+    a.download = rec.filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    await new Promise(r => setTimeout(r, 250));
+  }
+  document.getElementById('archiveResult').textContent = `Downloaded ${all.length} photo(s).`;
+}
+
+// Restore settings from the IndexedDB mirror if localStorage was wiped (reload once to apply).
+(async () => {
+  try {
+    if (localStorage.getItem('resibooth_cfg')) return;
+    const mirrored = await metaGet('cfg');
+    if (mirrored) { localStorage.setItem('resibooth_cfg', JSON.stringify(mirrored)); location.reload(); }
+  } catch (e) {}
+})();
+
+// Settings can also be moved between browsers / addresses (file:// and localhost are separate storage areas).
+document.getElementById('btnCfgExport').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(appConfig, null, 2)], { type: 'application/json' }));
+  a.download = 'resibooth-settings.json';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+document.getElementById('btnCfgImport').onclick = () => document.getElementById('cfgImportFile').click();
+document.getElementById('cfgImportFile').onchange = async ev => {
+  try {
+    const f = ev.target.files[0]; if (!f) return;
+    const imported = JSON.parse(await f.text());
+    appConfig = { ...defaultConfig, ...imported };
+    persistConfig();
+    setTimeout(() => location.reload(), 300);
+  } catch (e) { alert('Could not import settings: ' + e); }
+};
+
+document.getElementById('btnArchiveFolder').onclick = chooseBackupFolder;
+document.getElementById('btnArchiveSave').onclick = saveAllToFolder;
+document.getElementById('btnArchiveDownload').onclick = downloadAllArchive;
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist();   // ask Edge not to evict
+refreshArchiveStatus();
+
+async function enqueueSessionUpload() {
+  const sid = 'S' + Date.now().toString(36).toUpperCase();
+  const tag = (appConfig.sessionPrefix || '').replace(/[^\w]/g, '');
+  // Save/upload ONE collage image: the same receipt layout that prints on thermal paper.
+  let collageUrl;
+  try {
+    const rc = await renderReceiptCanvas(true);          // same layout, photos in full colour
+    collageUrl = rc.toDataURL('image/jpeg', 0.92);
+  } catch (e) { archiveError = 'Could not build collage: ' + ((e && e.message) || e); return; }
+  const recs = [{
+    filename: `${tag}_${sid}_receipt.jpg`, sessionId: sid, dataUrl: collageUrl, mime: 'image/jpeg', ts: Date.now()
+  }];
+
+  // 1) Local archive first (always), then 2) optional folder copy.
+  for (const rec of recs) {
+    try { await archiveAdd(rec); archiveError = ''; }
+    catch (e) { archiveError = 'Could not archive: ' + ((e && e.message) || e); }
+    writeToBackupFolder(rec);
+  }
+  refreshArchiveStatus();
+
+  // 3) Drive upload queue (unchanged behaviour).
+  if (!appConfig.driveUpload || !appConfig.driveWebhook) return;
+  try {
+    for (const rec of recs) await driveAdd({ ...rec, tries: 0 });
+  } catch (e) { driveLastError = 'Could not queue: ' + e; }
+  refreshDriveStatus();
+  processDriveQueue();
+}
+
+async function driveUploadOne(rec) {
+  const base64 = rec.dataUrl.split(',')[1];
+  const resp = await fetch(appConfig.driveWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // avoids CORS preflight
+    body: JSON.stringify({
+      secret: appConfig.driveSecret,
+      sessionId: rec.sessionId,
+      filename: rec.filename,
+      mime: rec.mime || 'image/jpeg',
+      data: base64
+    })
+  });
+  const out = await resp.json();
+  if (!out.ok) throw new Error(out.error || 'upload rejected');
+}
+
+async function processDriveQueue() {
+  if (driveBusy || !appConfig.driveUpload || !appConfig.driveWebhook || !navigator.onLine) {
+    refreshDriveStatus(); return;
+  }
+  driveBusy = true;
+  try {
+    const items = await driveAll();
+    for (const rec of items) {
+      try {
+        await driveUploadOne(rec);
+        await driveDel(rec.id);
+        localStorage.setItem('resibooth_uploaded', String(driveUploaded() + 1));
+        driveLastError = '';
+      } catch (err) {
+        driveLastError = (err && err.message) || String(err);
+        break;                       // stop; the retry timer will try again
+      }
+      refreshDriveStatus();
+    }
+  } catch (e) { driveLastError = String(e); }
+  driveBusy = false;
+  refreshDriveStatus();
+}
+
+async function testDriveConnection() {
+  const out = document.getElementById('driveTestResult');
+  const url = document.getElementById('cfgDriveWebhook').value.trim();
+  const secret = document.getElementById('cfgDriveSecret').value.trim();
+  if (!url) { out.textContent = 'Enter the Web App URL first.'; return; }
+  out.textContent = 'Testing…';
+  try {
+    const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'secret=' + encodeURIComponent(secret));
+    const j = await r.json();
+    out.textContent = j.ok ? ('Connected ✓ Folder: ' + j.folder) : ('Failed: ' + j.error);
+  } catch (e) {
+    out.textContent = 'Could not reach the script. Check the URL, that access is set to "Anyone", and the internet connection.';
+  }
+}
+
+document.getElementById('btnDriveTest').onclick = testDriveConnection;
+document.getElementById('btnDriveRetry').onclick = () => {
+  // use the values currently typed, without needing Save first
+  appConfig.driveUpload = document.getElementById('cfgDriveUpload').value === 'true';
+  appConfig.driveWebhook = document.getElementById('cfgDriveWebhook').value.trim();
+  appConfig.driveSecret = document.getElementById('cfgDriveSecret').value.trim();
+  driveLastError = '';
+  persistConfig();                 // typed Drive settings are kept, not just used for this run
+  processDriveQueue();
+};
+document.getElementById('btnDriveClear').onclick = async () => {
+  if (!confirm('Delete all photos waiting to upload? They will NOT be sent to Drive.')) return;
+  await driveClear(); driveLastError = ''; refreshDriveStatus();
+};
+window.addEventListener('online', () => { driveLastError = ''; processDriveQueue(); });
+window.addEventListener('offline', refreshDriveStatus);
+setInterval(processDriveQueue, 30000);
+refreshDriveStatus();
+processDriveQueue();
+
+/* ========================================================== */
+/* DIRECT THERMAL PRINTING (ESC/POS RASTER OVER WEBUSB)       */
+/* Tested target: POS-80 / RP30SG-class (USB VID 0x0418)      */
+/* Requires Chrome/Edge on desktop or Android (WebUSB).       */
+/* ========================================================== */
+const PRINT_MARGIN = 16;
+let usbPrinter = null;       // { device, epOut }
+
+function setPrintStatus(msg, isError) {
+  let el = document.getElementById('printStatus');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'printStatus';
+    el.style.cssText = 'font-size:12px;text-align:center;min-height:16px';
+    document.getElementById('btnOutputPrint').parentNode.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.color = isError ? '#f87171' : '#9ba3b5';
+}
+
+async function connectPrinter(forcePrompt) {
+  if (!navigator.usb) throw new Error('WebUSB not supported. Open this page in Chrome or Edge.');
+  if (usbPrinter && usbPrinter.device.opened) return usbPrinter;
+
+  let device = null;
+  if (!forcePrompt) {
+    const paired = await navigator.usb.getDevices();
+    device = paired.find(d => d.vendorId === 0x0418) || paired[0] || null;
+  }
+  if (!device) {
+    device = await navigator.usb.requestDevice({ filters: [{ vendorId: 0x0418 }, { classCode: 7 }] });
+  }
+  await device.open();
+  if (!device.configuration) await device.selectConfiguration(1);
+
+  let found = null;
+  for (const iface of device.configuration.interfaces) {
+    for (const alt of iface.alternates) {
+      if (alt.interfaceClass !== 7) continue;
+      const out = alt.endpoints.find(e => e.direction === 'out');
+      if (out) { found = { iface, alt, out }; break; }
+    }
+    if (found) break;
+  }
+  if (!found) throw new Error('No printer-class USB interface found.');
+
+  await device.claimInterface(found.iface.interfaceNumber);
+  if (found.alt.alternateSetting) {
+    await device.selectAlternateInterface(found.iface.interfaceNumber, found.alt.alternateSetting);
+  }
+  usbPrinter = { device, epOut: found.out.endpointNumber };
+  return usbPrinter;
+}
+
+function loadImage(src) {
+  return new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = src;
+  });
+}
+
+// Draws the entire receipt onto one canvas at printer resolution.
+async function renderReceiptCanvas(color) {
+  const W = (appConfig.printWidth || 576);
+  const tile = W - PRINT_MARGIN * 2;
+  const tiles = [];
+  for (const src of sessionImages) {
+    const img = await loadImage(src);
+    tiles.push(color ? img : await loadImage(processDither(img, tile, true)));
+  }
+
+  let qrCanvas = null;
+  try {
+    qrCanvas = document.createElement('canvas');
+    new QRious({ element: qrCanvas, value: appConfig.driveUrl, size: 160, level: 'M' });
+  } catch (e) { qrCanvas = null; }
+
+  const lines = [appConfig.line1, appConfig.line2].filter(Boolean);
+  const H = 40 + 150 + tiles.length * (tile + 24) + 40 + lines.length * 34 + 40 + 100
+          + (qrCanvas ? 200 : 0) + 120;
+
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#000'; g.textBaseline = 'top'; g.textAlign = 'center';
+
+  const MONO = '"Courier New", Courier, monospace';
+  const fit = (text, px, weight) => {            // shrink font until text fits
+    let s = px;
+    do { g.font = `${weight} ${s}px ${MONO}`; s -= 2; }
+    while (g.measureText(text).width > W - PRINT_MARGIN * 2 && s > 10);
+  };
+  const dash = (yy) => {
+    g.save(); g.setLineDash([8, 6]); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(PRINT_MARGIN, yy); g.lineTo(W - PRINT_MARGIN, yy); g.stroke(); g.restore();
+  };
+
+  let y = 20;
+  g.font = `bold 22px ${MONO}`; g.fillText('* * * * *', W / 2, y); y += 36;
+  fit(appConfig.eventTitle, 38, 'bold'); g.fillText(appConfig.eventTitle, W / 2, y); y += 52;
+  fit(appConfig.eventTagline, 22, 'normal'); g.fillText(appConfig.eventTagline, W / 2, y); y += 36;
+  dash(y); y += 14;
+  g.font = `bold 20px ${MONO}`;
+  g.textAlign = 'left';  g.fillText('TERMINAL: RESI-01', PRINT_MARGIN, y);
+  g.textAlign = 'right'; g.fillText(appConfig.sessionPrefix, W - PRINT_MARGIN, y);
+  y += 32; dash(y); y += 18;
+
+  g.textAlign = 'center';
+  for (const t of tiles) {
+    g.drawImage(t, PRINT_MARGIN, y, tile, tile);
+    y += tile + 24;
+  }
+
+  dash(y); y += 14;
+  g.textAlign = 'left';
+  for (const l of lines) { fit(l, 22, 'normal'); g.fillText(l, PRINT_MARGIN, y); y += 34; }
+  dash(y); y += 18;
+
+  g.textAlign = 'center';
+  fit(appConfig.footerNote, 22, 'bold'); g.fillText(appConfig.footerNote, W / 2, y); y += 40;
+
+  // Simple Code-39-style bar strip (decorative)
+  let x = (W - 360) / 2;
+  const seed = (appConfig.sessionPrefix + 'RESI').split('').reduce((a, ch) => a + ch.charCodeAt(0), 7);
+  for (let i = 0; i < 60; i++) {
+    const bw = 2 + ((seed * (i + 3) * 7) % 4);
+    if (i % 2 === 0) g.fillRect(x, y, bw, 56);
+    x += bw + 2; if (x > (W + 360) / 2) break;
+  }
+  y += 70;
+
+  if (qrCanvas) {
+    g.drawImage(qrCanvas, W / 2 - 80, y, 160, 160); y += 172;
+    g.font = `bold 18px ${MONO}`; g.fillText('SCAN FOR DIGITAL COPY', W / 2, y); y += 30;
+  }
+  y += 10;
+
+  // Trim to content, then convert whole receipt to 1-bit
+  const out = document.createElement('canvas');
+  out.width = W; out.height = Math.min(H, Math.ceil(y));
+  out.getContext('2d').drawImage(c, 0, 0);
+  return out;
+}
+
+// Canvas -> ESC/POS bytes (GS v 0 raster, banded for small printer buffers)
+function canvasToEscPos(canvas) {
+  const w = canvas.width, h = canvas.height;
+  const bytesPerRow = Math.ceil(w / 8);
+  const px = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+
+  // Threshold on luminance (tiles are already dithered; text stays crisp)
+  const bits = new Uint8Array(bytesPerRow * h);
+  for (let yy = 0; yy < h; yy++) {
+    for (let xx = 0; xx < w; xx++) {
+      const i = (yy * w + xx) * 4;
+      const lum = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+      if (lum < 128) bits[yy * bytesPerRow + (xx >> 3)] |= 0x80 >> (xx & 7);
+    }
+  }
+
+  const BAND = 128, parts = [new Uint8Array([0x1B, 0x40])]; // ESC @ init
+  for (let y0 = 0; y0 < h; y0 += BAND) {
+    const rows = Math.min(BAND, h - y0);
+    parts.push(new Uint8Array([0x1D, 0x76, 0x30, 0x00,
+      bytesPerRow & 255, bytesPerRow >> 8, rows & 255, rows >> 8]));
+    parts.push(bits.subarray(y0 * bytesPerRow, (y0 + rows) * bytesPerRow));
+  }
+  parts.push(new Uint8Array([0x1B, 0x64, 0x05]));          // feed 5 lines
+  parts.push(new Uint8Array([0x1D, 0x56, 0x42, 0x00]));    // partial cut (ignored if no cutter)
+
+  const total = parts.reduce((a, p) => a + p.length, 0);
+  const buf = new Uint8Array(total);
+  let o = 0; for (const p of parts) { buf.set(p, o); o += p.length; }
+  return buf;
+}
+
+async function sendToPrinter(bytes, forcePrompt) {
+  const p = await connectPrinter(forcePrompt);
+  const CHUNK = 4096;
+  for (let o = 0; o < bytes.length; o += CHUNK) {
+    await p.device.transferOut(p.epOut, bytes.subarray(o, o + CHUNK));
+  }
+}
+
+async function printReceiptDirect(forcePrompt) {
+  setPrintStatus('Preparing receipt…');
+  const canvas = await renderReceiptCanvas();
+  const bytes = canvasToEscPos(canvas);
+  setPrintStatus('Printing…');
+  await sendToPrinter(bytes, forcePrompt);
+  setPrintStatus('Printed ✓');
+}
+
+document.getElementById('btnOutputPrint').onclick = async () => {
+  const btn = document.getElementById('btnOutputPrint');
+  btn.disabled = true;
+  try {
+    await printReceiptDirect(false);
+  } catch (err) {
+    console.error('Direct print failed:', err);
+    usbPrinter = null;
+    if (err && err.name === 'NotFoundError') {
+      setPrintStatus('No printer selected. Tap print again and pick the USB printer.', true);
+    } else {
+      setPrintStatus('Direct print failed (' + (err.message || err) + '). Falling back to system print.', true);
+      setTimeout(() => window.print(), 600);
+    }
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+// Initial setup
+document.getElementById('eventBadgeText').textContent = appConfig.eventTitle;
+document.getElementById('heroEventTitle').textContent = appConfig.eventTitle;
+document.getElementById('heroWelcomeDesc').textContent = appConfig.welcomeDesc;
+document.getElementById('badgeIntervalInfo').textContent = `${appConfig.intervalPause}s Pose Interval`;
+</script>
+
+</body>
+</html>
