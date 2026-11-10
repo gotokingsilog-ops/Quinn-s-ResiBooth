@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0f17">
+<title>Your RESIBOOTH photo</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    background: #0b0f17; color: #e5e7eb; padding: 24px 16px 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center;
+  }
+  h1 { font-size: 20px; letter-spacing: 2px; margin: 8px 0 4px; }
+  p { color: #9ca3af; margin: 6px 0; line-height: 1.5; }
+  .card { width: 100%; max-width: 520px; margin-top: 16px; }
+  img { width: 100%; border-radius: 12px; background: #111827; display: block; }
+  .btns { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  a.btn {
+    display: block; padding: 14px; border-radius: 10px; text-decoration: none; font-weight: 700;
+    background: #4f46e5; color: #fff;
+  }
+  a.btn.alt { background: #1e293b; color: #e5e7eb; }
+  .spin {
+    width: 36px; height: 36px; margin: 28px auto 10px; border-radius: 50%;
+    border: 4px solid #1e293b; border-top-color: #6366f1; animation: s 1s linear infinite;
+  }
+  @keyframes s { to { transform: rotate(360deg); } }
+  .hint { font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>RESIBOOTH</h1>
+<div class="card" id="box">
+  <div class="spin"></div>
+  <p>Finding your photo…</p>
+</div>
+
+<script>
+const q = new URLSearchParams(location.search);
+const sid = q.get('p') || '';
+const api = q.get('u') || (q.get('s') ? 'https://script.google.com/macros/s/' + q.get('s') + '/exec' : '');
+const box = document.getElementById('box');
+let tries = 0;
+
+function esc(t) { return String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+function waiting(msg) {
+  box.innerHTML = '<div class="spin"></div><p>' + msg + '</p>' +
+    '<p class="hint">This page checks again by itself. You can keep it open or come back later with the same QR code.</p>';
+}
+
+function show(j) {
+  box.innerHTML =
+    '<img src="' + esc(j.thumb) + '" alt="Your photo">' +
+    '<div class="btns">' +
+      '<a class="btn" href="' + esc(j.download) + '">Download photo</a>' +
+      '<a class="btn alt" href="' + esc(j.view) + '" target="_blank" rel="noopener">Open in Google Drive</a>' +
+      (j.folder ? '<a class="btn alt" href="' + esc(j.folder) + '" target="_blank" rel="noopener">See all event photos</a>' : '') +
+    '</div>' +
+    '<p class="hint">On a phone, you can also press and hold the photo to save it.</p>';
+}
+
+async function check() {
+  if (!sid || !api || !api.startsWith('https://script.google.com/')) {
+    box.innerHTML = '<p>This link is not valid. Please scan the QR code on your receipt again.</p>';
+    return;
+  }
+  tries++;
+  try {
+    const r = await fetch(api + '?photo=' + encodeURIComponent(sid));
+    const j = await r.json();
+    if (j.ok && j.ready) return show(j);
+    if (!j.ok) { box.innerHTML = '<p>Sorry, this photo could not be found.</p>'; return; }
+    waiting('Your photo is still uploading…');
+  } catch (e) {
+    waiting('Could not connect. Trying again…');
+  }
+  setTimeout(check, tries < 30 ? 10000 : 60000);
+}
+check();
+</script>
+</body>
+</html>

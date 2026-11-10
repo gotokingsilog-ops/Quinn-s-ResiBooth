@@ -18,6 +18,11 @@
    - Type the **Event Folder Name** (blank = uses the Event Title)
    - Press **Test & get folder link** (shows the event folder and fills the QR link), then **Save**.
 
+QR ON THE RECEIPT: by default it opens that guest's own photo (Admin > "QR Code Opens").
+The guest page (photo.html) shows "still uploading" until the photo reaches Drive,
+then shows it with a Download button. Set it to "The whole event folder" to go back
+to the old behaviour.
+
 NEW EVENT: just change the **Event Folder Name** in the app and press **Save**.
 The new folder is created and the QR link updates by itself. No script changes.
 

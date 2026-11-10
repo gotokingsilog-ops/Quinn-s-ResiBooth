@@ -52,9 +52,31 @@ function eventFolder_(eventName) {
   }
 }
 
+// Guest photo lookup (public, no secret):  GET <url>?photo=<session id>
+// The session id is random and printed only on that guest's receipt QR.
+function findPhoto_(sid) {
+  if (!/^S[A-Z0-9]{8,24}$/.test(sid)) return json_({ ok: false, error: 'bad id' });
+  var it = DriveApp.searchFiles("title contains '" + sid + "' and trashed = false");
+  while (it.hasNext()) {
+    var f = it.next();
+    if (f.getName().indexOf('_' + sid + '_') < 0) continue;
+    var parents = f.getParents();
+    var folderUrl = parents.hasNext() ? parents.next().getUrl() : '';
+    return json_({
+      ok: true, ready: true, id: f.getId(), name: f.getName(),
+      view: 'https://drive.google.com/file/d/' + f.getId() + '/view',
+      download: 'https://drive.google.com/uc?export=download&id=' + f.getId(),
+      thumb: 'https://drive.google.com/thumbnail?id=' + f.getId() + '&sz=w1600',
+      folder: folderUrl
+    });
+  }
+  return json_({ ok: true, ready: false });   // not uploaded yet
+}
+
 // Connection test / get event folder link:  GET <url>?secret=...&event=...
 function doGet(e) {
   var p = (e && e.parameter) || {};
+  if (p.photo) return findPhoto_(String(p.photo));
   if (p.secret !== SECRET) return json_({ ok: false, error: 'bad secret' });
   try {
     var folder = eventFolder_(p.event);
@@ -85,6 +107,9 @@ function doPost(e) {
     var blob = Utilities.newBlob(
       Utilities.base64Decode(body.data), body.mime || 'image/jpeg', safeName);
     var file = folder.createFile(blob);
+    try {   // so the guest can open it from the receipt QR
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr) { /* sharing blocked by account policy */ }
     return json_({ ok: true, id: file.getId(), url: file.getUrl(), folder: folder.getName() });
   } catch (err) {
     return json_({ ok: false, error: String(err) });

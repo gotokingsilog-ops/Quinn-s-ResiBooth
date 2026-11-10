@@ -1852,6 +1852,15 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
           </div>
 
           <div class="form-row">
+            <label class="form-label">QR Code Opens</label>
+            <select class="form-select" id="cfgQrMode">
+              <option value="photo">This guest's photo only</option>
+              <option value="folder">The whole event folder</option>
+            </select>
+            <div class="form-help">"Photo only" needs Drive upload On. The photo appears a few seconds after upload (later if WiFi is down); the page keeps checking by itself.</div>
+          </div>
+
+          <div class="form-row">
             <label class="form-label">QR Code Link (Event Folder)</label>
             <input class="form-input" id="cfgDriveLink" value="https://drive.google.com/drive/folders/resibooth-demo-event">
             <div class="form-help">
@@ -1978,6 +1987,7 @@ const defaultConfig = {
   driveUpload: false,
   driveWebhook: "",
   driveSecret: "",
+  qrMode: "photo",  // "photo" = QR opens this guest's photo, "folder" = whole event folder
   driveEvent: "",   // Drive sub-folder name for this event (blank = event title)
   countdown: 3,
   printLevel: 6.5,  // print brightness 1 (dark) .. 10 (light)
@@ -2012,6 +2022,29 @@ let currentActiveView = 'viewWelcome';
 let currentLayout = "strip-3";
 let requiredShots = 3;
 let sessionImages = [];
+let currentSessionId = null;   // random id of the current receipt; used in the filename and the QR
+
+function newSessionId() {
+  const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const b = crypto.getRandomValues(new Uint8Array(12));
+  return 'S' + Array.from(b, x => abc[x % abc.length]).join('');
+}
+
+// What the receipt QR opens: this session's photo page, or the event folder.
+function receiptQrValue() {
+  const sid = currentSessionId;
+  if (appConfig.qrMode === 'folder' || !appConfig.driveUpload || !appConfig.driveWebhook || !sid) {
+    return appConfig.driveUrl;
+  }
+  const page = new URL('photo.html', location.href);
+  page.search = '';
+  page.hash = '';
+  const m = appConfig.driveWebhook.match(/\/macros\/s\/([^/]+)\/exec/);
+  if (m) page.searchParams.set('s', m[1]);              // short form keeps the QR small
+  else page.searchParams.set('u', appConfig.driveWebhook);
+  page.searchParams.set('p', sid);
+  return page.toString();
+}
 let mediaStream = null;
 let resetTimer = null;
 let resetCountdownRemaining = 45;
@@ -2365,6 +2398,7 @@ function processDither(imgObj, size, forPrint) {
 /* THERMAL RECEIPT COMPOSITOR (1:1 SQUARE TILES)              */
 /* ========================================================== */
 function composeFinalReceipt() {
+  currentSessionId = newSessionId();
   document.getElementById('rcptEventTitle').textContent = appConfig.eventTitle;
   document.getElementById('rcptEventSub').textContent = appConfig.eventTagline;
   document.getElementById('rcptSessionNo').textContent = appConfig.sessionPrefix;
@@ -2398,7 +2432,7 @@ function composeFinalReceipt() {
   try {
     new QRious({
       element: document.getElementById('rcptQrCode'),
-      value: appConfig.driveUrl,
+      value: receiptQrValue(),
       size: 64
     });
   } catch (err) {
@@ -2513,6 +2547,7 @@ function loadAdminInputs() {
   document.getElementById('cfgDriveWebhook').value = appConfig.driveWebhook;
   document.getElementById('cfgDriveSecret').value = appConfig.driveSecret;
   document.getElementById('cfgDriveEvent').value = appConfig.driveEvent || '';
+  document.getElementById('cfgQrMode').value = appConfig.qrMode || 'photo';
   refreshDriveStatus();
   document.getElementById('cfgCountdownDuration').value = appConfig.countdown;
   document.getElementById('cfgIntervalBetweenShots').value = appConfig.intervalPause;
@@ -2643,6 +2678,7 @@ document.getElementById('btnSaveAdminConfig').onclick = () => {
   appConfig.driveWebhook = document.getElementById('cfgDriveWebhook').value.trim();
   appConfig.driveSecret = document.getElementById('cfgDriveSecret').value.trim();
   appConfig.driveEvent = document.getElementById('cfgDriveEvent').value.trim();
+  appConfig.qrMode = document.getElementById('cfgQrMode').value;
   appConfig.countdown = parseInt(document.getElementById('cfgCountdownDuration').value, 10);
   appConfig.intervalPause = parseInt(document.getElementById('cfgIntervalBetweenShots').value, 10);
   appConfig.autoResetTime = parseInt(document.getElementById('cfgAutoResetTime').value, 10);
@@ -2884,7 +2920,7 @@ if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 refreshArchiveStatus();
 
 async function enqueueSessionUpload() {
-  const sid = 'S' + Date.now().toString(36).toUpperCase();
+  const sid = currentSessionId || newSessionId();
   const tag = (appConfig.sessionPrefix || '').replace(/[^\w]/g, '');
   // Save/upload ONE collage image: the same receipt layout that prints on thermal paper.
   let collageUrl;
@@ -3096,12 +3132,12 @@ async function renderReceiptCanvas(color) {
   let qrCanvas = null;
   try {
     qrCanvas = document.createElement('canvas');
-    new QRious({ element: qrCanvas, value: appConfig.driveUrl, size: 160, level: 'M' });
+    new QRious({ element: qrCanvas, value: receiptQrValue(), size: 220, level: 'M' });
   } catch (e) { qrCanvas = null; }
 
   const lines = [appConfig.line1, appConfig.line2].filter(Boolean);
   const H = 40 + 150 + tiles.length * (tile + 24) + 40 + lines.length * 34 + 40 + 100
-          + (qrCanvas ? 200 : 0) + 120;
+          + (qrCanvas ? 260 : 0) + 120;
 
   const c = document.createElement('canvas');
   c.width = W; c.height = H;
@@ -3155,7 +3191,7 @@ async function renderReceiptCanvas(color) {
   y += 70;
 
   if (qrCanvas) {
-    g.drawImage(qrCanvas, W / 2 - 80, y, 160, 160); y += 172;
+    g.drawImage(qrCanvas, W / 2 - 110, y, 220, 220); y += 232;
     g.font = `bold 18px ${MONO}`; g.fillText('SCAN FOR DIGITAL COPY', W / 2, y); y += 30;
   }
   y += 10;
