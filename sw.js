@@ -1,5 +1,5 @@
 // RESIBOOTH service worker: makes the app installable and lets it open offline.
-const CACHE = 'resibooth-v3';
+const CACHE = 'resibooth-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {

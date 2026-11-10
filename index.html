@@ -435,7 +435,7 @@ button:active { transform: scale(0.98); }
 .camera-viewfinder video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;   /* show the whole camera view, so the square box = exact capture */
   position: absolute;
   inset: 0;
   transform: scaleX(-1);
@@ -2156,14 +2156,33 @@ function abortSession() {
 async function openMediaStream() {
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
+      // 4:3 uses the full camera sensor. 16:9 cuts off the top and bottom,
+      // which makes the square capture much tighter.
+      video: { facingMode: "user", aspectRatio: { ideal: 4 / 3 }, width: { ideal: 1920 }, height: { ideal: 1440 } },
       audio: false
     });
-    document.getElementById('studioVideo').srcObject = mediaStream;
+    const v = document.getElementById('studioVideo');
+    v.srcObject = mediaStream;
+    v.onloadedmetadata = fitFramingBox;
   } catch (err) {
     console.warn("Live camera device not connected. Falling back to synthetic portrait generation.");
   }
 }
+
+// Size the dashed square so it covers exactly the area getCaptureFrame() keeps:
+// the largest centred square of the camera image, as shown on screen.
+function fitFramingBox() {
+  const vid = document.getElementById('studioVideo');
+  const box = document.querySelector('.square-framing-box');
+  if (!vid || !box || !vid.videoWidth) return;
+  const W = vid.clientWidth, H = vid.clientHeight;
+  const scale = Math.min(W / vid.videoWidth, H / vid.videoHeight);   // object-fit: contain
+  const side = Math.floor(Math.min(vid.videoWidth, vid.videoHeight) * scale);
+  if (side > 0) { box.style.width = side + 'px'; box.style.height = side + 'px'; }
+}
+// Re-fit whenever the viewfinder changes size (view opens, rotation, resize).
+if ('ResizeObserver' in window) new ResizeObserver(fitFramingBox).observe(document.getElementById('studioVideo'));
+window.addEventListener('resize', fitFramingBox);
 
 function closeMediaStream() {
   if (mediaStream) {
