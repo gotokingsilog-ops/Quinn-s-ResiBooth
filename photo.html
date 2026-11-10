@@ -21,7 +21,6 @@
     display: block; padding: 14px; border-radius: 10px; text-decoration: none; font-weight: 700;
     background: #4f46e5; color: #fff;
   }
-  a.btn.alt { background: #1e293b; color: #e5e7eb; }
   .spin {
     width: 36px; height: 36px; margin: 28px auto 10px; border-radius: 50%;
     border: 4px solid #1e293b; border-top-color: #6366f1; animation: s 1s linear infinite;
@@ -56,8 +55,6 @@ function show(j) {
     '<img src="' + esc(j.thumb) + '" alt="Your photo">' +
     '<div class="btns">' +
       '<a class="btn" href="' + esc(j.download) + '">Download photo</a>' +
-      '<a class="btn alt" href="' + esc(j.view) + '" target="_blank" rel="noopener">Open in Google Drive</a>' +
-      (j.folder ? '<a class="btn alt" href="' + esc(j.folder) + '" target="_blank" rel="noopener">See all event photos</a>' : '') +
     '</div>' +
     '<p class="hint">On a phone, you can also press and hold the photo to save it.</p>';
 }
