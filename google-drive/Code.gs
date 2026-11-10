@@ -3,9 +3,9 @@
  *
  * SETUP (see SETUP.md):
  *  1. Set FOLDER_ID below to your MAIN RESIBOOTH folder (set it once, never again).
- *     Each event gets its own PRIVATE sub-folder inside it, created automatically
- *     from the "Event Folder Name" in the app's admin console. Only single photo
- *     files are shared, so a guest's QR opens their photo and nothing else.
+ *     Each event gets its own sub-folder inside it (shared "Anyone with the link"),
+ *     created automatically from the "Event Folder Name" in the app's admin console.
+ *     The guest QR only ever opens that guest's single photo, never the folder.
  *  2. Set SECRET to a long random string. Paste the same value in the
  *     RESIBOOTH admin console (Google Drive & QR tab).
  *  3. Deploy > New deployment > Web app
@@ -31,8 +31,9 @@ function json_(obj) {
 }
 
 // Returns the folder for this event: a sub-folder of the main folder with the
-// event's name, created if new. The folder stays PRIVATE so guests cannot browse
-// other people's photos; each photo file is shared on its own (see doPost).
+// event's name. Created (and shared "Anyone with the link can view") if new.
+// Guests never see this link: the receipt QR and photo page only give out the
+// single photo, so a guest cannot reach other photos without their QR.
 // No event name -> the main folder itself (old behaviour).
 function eventFolder_(eventName) {
   var main = DriveApp.getFolderById(FOLDER_ID);
@@ -44,7 +45,11 @@ function eventFolder_(eventName) {
   try {
     var found = main.getFoldersByName(name);
     if (found.hasNext()) return found.next();
-    return main.createFolder(name);
+    var folder = main.createFolder(name);
+    try {
+      folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr) { /* sharing blocked by account policy; share it by hand */ }
+    return folder;
   } finally {
     lock.releaseLock();
   }
