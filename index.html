@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Caveat:wght@600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Fredoka:wght@500;600;700&family=Great+Vibes&family=Mountains+of+Christmas:wght@700&family=Pacifico&family=Playfair+Display:wght@600;800&family=Racing+Sans+One&family=Russo+One&family=JetBrains+Mono:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   /* Modern Flat Design Tokens */
@@ -1360,9 +1360,349 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
 @media print {
   .thermal-sheet { transform: none !important; box-shadow: none !important; }
 }
+
+/* ================================================================== */
+/* KIOSK APP SHELL + BOOTH THEMES                                      */
+/* Guest screens are full screen and themed with --t-* variables.      */
+/* The admin console keeps its own look (it does not use --t-*).       */
+/* ================================================================== */
+body {
+  /* VINTAGE (default) = the original look */
+  --t-bg: radial-gradient(circle at 12% 18%, rgba(255,92,138,.22) 0 54px, transparent 55px),
+          radial-gradient(circle at 88% 12%, rgba(76,201,240,.28) 0 70px, transparent 71px),
+          radial-gradient(circle at 78% 82%, rgba(255,210,63,.40) 0 60px, transparent 61px),
+          radial-gradient(circle at 8% 86%, rgba(123,92,255,.20) 0 80px, transparent 81px),
+          radial-gradient(rgba(43,27,74,.10) 1.5px, transparent 1.6px) 0 0/26px 26px, #fff6e8;
+  --t-bg-solid: #fff6e8; --t-ink: #2b1b4a; --t-muted: #5b4a7d; --t-title: #2b1b4a; --t-kicker: #7b5cff;
+  --t-accent: #ff5c8a; --t-on-accent: #fff; --t-accent2: #ffd23f; --t-on-accent2: #2b1b4a;
+  --t-chip: #fff; --t-line: rgba(43,27,74,.25);
+  --t-card: #fff; --t-card-border: 3px solid #2b1b4a; --t-card-shadow: 8px 8px 0 #2b1b4a; --t-card-radius: 24px;
+  --t-btn-radius: 22px; --t-btn-shadow: 6px 6px 0 #2b1b4a; --t-btn-border: 3px solid #2b1b4a;
+  --t-display: 'Fredoka', sans-serif; --t-body: 'Fredoka', sans-serif;
+  --t-title-size: clamp(56px, 10vw, 130px); --t-title-shadow: 5px 5px 0 #ffd23f; --t-title-shadow-sm: 3px 3px 0 #ffd23f;
+  --t-cam-bg: #2b1b4a; --t-cam-dim: rgba(43,27,74,.6);
+  --t-frame-border: 5px dashed #ffd23f; --t-frame-radius: 24px;
+  --t-count-color: #ffd23f; --t-count-shadow: 8px 8px 0 #ff5c8a; --t-count-stroke: 6px #2b1b4a;
+  background: var(--t-bg) !important;
+  background-attachment: fixed !important;
+  height: 100vh; height: 100dvh; overflow: hidden;
+}
+
+/* --- Cartoony: comic book --- */
+body[data-ui="cartoony"] {
+  --t-bg: radial-gradient(rgba(230,40,40,.28) 3px, transparent 3.5px) 0 0/18px 18px, #ffe14d;
+  --t-bg-solid: #ffe14d; --t-ink: #111; --t-muted: #222; --t-title: #ff2e2e; --t-kicker: #111;
+  --t-accent: #1e6bff; --t-on-accent: #fff; --t-accent2: #ff2e2e; --t-on-accent2: #fff;
+  --t-chip: #fff; --t-line: #111; --t-card: #fff; --t-card-border: 5px solid #111; --t-card-shadow: 10px 10px 0 #111; --t-card-radius: 6px;
+  --t-btn-radius: 10px; --t-btn-shadow: 8px 8px 0 #111; --t-btn-border: 5px solid #111; --t-btn-track: .06em;
+  --t-display: 'Bangers', cursive; --t-body: 'Fredoka', sans-serif; --t-track: .04em;
+  --t-title-size: clamp(64px, 12vw, 160px); --t-title-shadow: 8px 8px 0 #111; --t-title-shadow-sm: 4px 4px 0 #111;
+  --t-title-stroke: 4px #111; --t-title-skew: rotate(-3deg);
+  --t-cam-bg: #111; --t-cam-dim: rgba(0,0,0,.6); --t-frame-border: 12px solid #111; --t-frame-radius: 0;
+  --t-count-color: #ffe14d; --t-count-shadow: 10px 10px 0 #ff2e2e; --t-count-stroke: 8px #111;
+}
+/* --- Racing: sunset, asphalt, checkered flags --- */
+body[data-ui="racing"] {
+  --t-bg: linear-gradient(180deg, #e9632b 0%, #f2a541 38%, #f6d18a 62%, #3a3a40 62.2%, #2a2a2f 100%);
+  --t-bg-solid: #2a2a2f; --t-ink: #fff; --t-muted: #fff3e0; --t-title: #fff; --t-kicker: #111;
+  --t-accent: #e10600; --t-on-accent: #fff; --t-accent2: #ffd400; --t-on-accent2: #111;
+  --t-chip: rgba(0,0,0,.35); --t-line: rgba(255,255,255,.35);
+  --t-card: #1f1f24; --t-card-border: 4px solid #fff; --t-card-shadow: 0 16px 40px rgba(0,0,0,.45); --t-card-radius: 18px;
+  --t-btn-radius: 12px; --t-btn-shadow: 0 8px 0 #7d0300, 0 18px 30px rgba(0,0,0,.4); --t-btn-border: 0; --t-btn-skew: skewX(-10deg);
+  --t-display: 'Racing Sans One', sans-serif; --t-body: 'Russo One', sans-serif;
+  --t-title-size: clamp(54px, 9vw, 110px); --t-title-shadow: 5px 5px 0 #e10600, 10px 10px 0 #111; --t-title-shadow-sm: 3px 3px 0 #e10600;
+  --t-title-skew: skewX(-10deg);
+  --t-cam-bg: #1b1b1f; --t-cam-dim: rgba(0,0,0,.6); --t-frame-border: 4px solid #e10600; --t-frame-radius: 0;
+  --t-count-color: #fff; --t-count-shadow: 0 10px 40px rgba(0,0,0,.6); --t-count-stroke: 0;
+}
+/* --- Fairy: twilight garden, sparkles --- */
+body[data-ui="fairy"] {
+  --t-bg: radial-gradient(ellipse at 50% 110%, #ffb3e1 0%, transparent 55%), radial-gradient(ellipse at 50% 0%, #6d4bc4 0%, #3b2370 60%, #22124a 100%);
+  --t-bg-solid: #3b2370; --t-ink: #fff; --t-muted: #e6dcff; --t-title: #fff3c4; --t-kicker: #ffb3e1;
+  --t-accent: #ff7ac8; --t-on-accent: #fff; --t-accent2: #9ff3d8; --t-on-accent2: #22124a;
+  --t-chip: rgba(255,255,255,.12); --t-line: rgba(255,255,255,.35);
+  --t-card: rgba(255,255,255,.12); --t-card-border: 2px solid rgba(255,255,255,.45); --t-card-shadow: 0 0 40px rgba(255,122,200,.35);
+  --t-card-radius: 120px 120px 24px 24px;
+  --t-btn-radius: 99px; --t-btn-shadow: 0 0 30px rgba(255,122,200,.8), 0 0 0 4px rgba(255,255,255,.35); --t-btn-border: 0;
+  --t-display: 'Cinzel Decorative', serif; --t-body: 'Cormorant Garamond', serif;
+  --t-title-size: clamp(44px, 7.5vw, 96px); --t-title-shadow: 0 0 30px rgba(255,220,150,.9), 0 0 6px #fff; --t-title-shadow-sm: 0 0 20px rgba(255,220,150,.8);
+  --t-cam-bg: #22124a; --t-cam-dim: rgba(34,18,74,.6); --t-frame-border: 3px solid #ffb3e1; --t-frame-radius: 40px;
+  --t-count-color: #fff3c4; --t-count-shadow: 0 0 40px rgba(255,220,150,.9); --t-count-stroke: 0;
+}
+/* --- Formal: corporate / gala --- */
+body[data-ui="formal"] {
+  --t-bg: linear-gradient(135deg, rgba(201,165,76,.06) 25%, transparent 25%) 0 0/40px 40px, linear-gradient(180deg, #0f1a2e, #0a1222);
+  --t-bg-solid: #0c1527; --t-ink: #f2efe6; --t-muted: #b9bfcc; --t-title: #fff; --t-kicker: #c9a54c;
+  --t-accent: #c9a54c; --t-on-accent: #0c1527; --t-accent2: #c9a54c; --t-on-accent2: #0c1527;
+  --t-chip: transparent; --t-line: rgba(201,165,76,.5);
+  --t-card: #111d33; --t-card-border: 1px solid rgba(201,165,76,.6); --t-card-shadow: 0 20px 50px rgba(0,0,0,.4); --t-card-radius: 2px;
+  --t-btn-radius: 2px; --t-btn-shadow: none; --t-btn-border: 0; --t-btn-case: uppercase; --t-btn-track: .28em;
+  --t-btn-font: 'Plus Jakarta Sans', sans-serif; --t-btn-weight: 800;
+  --t-display: 'Playfair Display', serif; --t-body: 'Plus Jakarta Sans', sans-serif;
+  --t-title-size: clamp(48px, 8.5vw, 110px); --t-title-shadow: none; --t-title-shadow-sm: none;
+  --t-cam-bg: #0a1222; --t-cam-dim: rgba(10,18,34,.65); --t-frame-border: 2px solid #c9a54c; --t-frame-radius: 0;
+  --t-count-color: #fff; --t-count-shadow: 0 10px 40px rgba(0,0,0,.6); --t-count-stroke: 0;
+}
+/* --- Wedding: ivory, gold, script --- */
+body[data-ui="wedding"] {
+  --t-bg: radial-gradient(ellipse at 50% 0%, #fffdf8 0%, #f6efe3 70%, #efe4d2 100%);
+  --t-bg-solid: #f8f2e8; --t-ink: #3b3226; --t-muted: #85765f; --t-title: #6b5233; --t-kicker: #8a9a7b;
+  --t-accent: #b8925a; --t-on-accent: #fff; --t-accent2: #8a9a7b; --t-on-accent2: #fff;
+  --t-chip: #fffaf1; --t-line: #e3d6bf; --t-card: #fffdf8; --t-card-border: 1px solid #e6d9c2;
+  --t-card-shadow: 0 14px 40px rgba(120,90,40,.12); --t-card-radius: 20px;
+  --t-btn-radius: 99px; --t-btn-shadow: 0 12px 30px rgba(184,146,90,.35); --t-btn-border: 0;
+  --t-btn-case: uppercase; --t-btn-track: .2em; --t-btn-font: 'Cormorant Garamond', serif;
+  --t-display: 'Great Vibes', cursive; --t-body: 'Cormorant Garamond', serif;
+  --t-title-size: clamp(64px, 12vw, 160px); --t-title-shadow: none; --t-title-shadow-sm: none;
+  --t-cam-bg: #2a241c; --t-cam-dim: rgba(42,36,28,.6); --t-frame-border: 3px solid #f3e2c0; --t-frame-radius: 0;
+  --t-count-color: #fff; --t-count-shadow: 0 10px 40px rgba(0,0,0,.6); --t-count-stroke: 0;
+}
+/* --- Christmas: pine, red, lights, snow --- */
+body[data-ui="christmas"] {
+  --t-bg: radial-gradient(circle, rgba(255,255,255,.9) 1.5px, transparent 2px) 0 0/60px 60px,
+          radial-gradient(circle, rgba(255,255,255,.6) 1px, transparent 1.5px) 30px 30px/60px 60px,
+          linear-gradient(180deg, #0c3b2e, #0a2e24);
+  --t-bg-solid: #0a2e24; --t-ink: #fff; --t-muted: #d7eadf; --t-title: #fff; --t-kicker: #f5c542;
+  --t-accent: #c8102e; --t-on-accent: #fff; --t-accent2: #f5c542; --t-on-accent2: #0a2e24;
+  --t-chip: rgba(255,255,255,.1); --t-line: rgba(255,255,255,.35);
+  --t-card: #fffaf0; --t-card-border: 4px solid #c8102e; --t-card-shadow: 0 16px 40px rgba(0,0,0,.35); --t-card-radius: 22px;
+  --t-card-ink: #0c3b2e; --t-card-muted: #4b6b5e;
+  --t-btn-radius: 99px; --t-btn-shadow: 0 8px 0 #7d0a1c, 0 16px 30px rgba(0,0,0,.35); --t-btn-border: 0;
+  --t-btn-font: 'Fredoka', sans-serif;
+  --t-display: 'Mountains of Christmas', cursive; --t-body: 'Fredoka', sans-serif;
+  --t-title-size: clamp(56px, 10.5vw, 136px); --t-title-shadow: 0 6px 0 #c8102e, 0 12px 30px rgba(0,0,0,.4); --t-title-shadow-sm: 0 4px 0 #c8102e;
+  --t-cam-bg: #0a2e24; --t-cam-dim: rgba(10,46,36,.6); --t-frame-border: 12px dashed #c8102e; --t-frame-radius: 0;
+  --t-count-color: #fff; --t-count-shadow: 0 8px 0 #c8102e; --t-count-stroke: 0;
+}
+/* --- Valentines: blush pink, red, hearts --- */
+body[data-ui="valentines"] {
+  --t-bg: radial-gradient(ellipse at 50% 30%, #fff0f4 0%, #ffd6e2 70%, #ffc2d4 100%);
+  --t-bg-solid: #ffe0ea; --t-ink: #5a0f2a; --t-muted: #9b3d5e; --t-title: #e11d48; --t-kicker: #be185d;
+  --t-accent: #e11d48; --t-on-accent: #fff; --t-accent2: #be185d; --t-on-accent2: #fff;
+  --t-chip: #fff; --t-line: #ffb3c7; --t-card: #fff; --t-card-border: 3px solid #ffb3c7;
+  --t-card-shadow: 0 16px 40px rgba(225,29,72,.18); --t-card-radius: 28px;
+  --t-btn-radius: 99px; --t-btn-shadow: 0 12px 30px rgba(225,29,72,.4); --t-btn-border: 0; --t-btn-font: 'Fredoka', sans-serif;
+  --t-display: 'Pacifico', cursive; --t-body: 'Fredoka', sans-serif;
+  --t-title-size: clamp(48px, 9vw, 116px); --t-title-shadow: 4px 4px 0 #fff; --t-title-shadow-sm: 3px 3px 0 #fff;
+  --t-cam-bg: #3a0a1c; --t-cam-dim: rgba(58,10,28,.6); --t-frame-border: 6px solid #ff8fab; --t-frame-radius: 30px;
+  --t-count-color: #fff; --t-count-shadow: 6px 6px 0 #e11d48; --t-count-stroke: 0;
+}
+/* --- Graduation: navy, gold, caps --- */
+body[data-ui="graduation"] {
+  --t-bg: linear-gradient(180deg, #13294b, #0b1a33);
+  --t-bg-solid: #0f2140; --t-ink: #fff; --t-muted: #c9d4e8; --t-title: #f2b705; --t-kicker: #fff;
+  --t-accent: #f2b705; --t-on-accent: #13294b; --t-accent2: #f2b705; --t-on-accent2: #13294b;
+  --t-chip: rgba(255,255,255,.1); --t-line: rgba(255,255,255,.3);
+  --t-card: #fff; --t-card-border: 0; --t-card-shadow: 0 0 0 6px #f2b705, 0 20px 40px rgba(0,0,0,.4); --t-card-radius: 10px;
+  --t-card-ink: #13294b; --t-card-muted: #4a5d80;
+  --t-btn-radius: 10px; --t-btn-shadow: 0 8px 0 #9c7600, 0 16px 30px rgba(0,0,0,.35); --t-btn-border: 0; --t-btn-track: .06em;
+  --t-display: 'Bebas Neue', sans-serif; --t-body: 'Plus Jakarta Sans', sans-serif; --t-track: .04em;
+  --t-title-size: clamp(70px, 13vw, 170px); --t-title-shadow: 0 8px 0 #0b1a33; --t-title-shadow-sm: none;
+  --t-cam-bg: #0b1a33; --t-cam-dim: rgba(11,26,51,.6); --t-frame-border: 10px solid #f2b705; --t-frame-radius: 0;
+  --t-count-color: #f2b705; --t-count-shadow: 0 10px 0 #0b1a33; --t-count-stroke: 0;
+}
+/* --- Birthday: candy colours, balloons --- */
+body[data-ui="birthday"] {
+  --t-bg: radial-gradient(circle at 20% 20%, #ffe3f1 0, transparent 40%), radial-gradient(circle at 80% 80%, #dff3ff 0, transparent 45%), #fff6e9;
+  --t-bg-solid: #fff6e9; --t-ink: #2b1d4a; --t-muted: #6a5a8c; --t-title: #ff3d8b; --t-kicker: #ff9f1c;
+  --t-accent: #7b3dff; --t-on-accent: #fff; --t-accent2: #ff9f1c; --t-on-accent2: #2b1d4a;
+  --t-chip: #fff; --t-line: #ead9ff; --t-card: #fff; --t-card-border: 4px solid #2b1d4a;
+  --t-card-shadow: 8px 8px 0 #2b1d4a; --t-card-radius: 28px;
+  --t-btn-radius: 26px; --t-btn-shadow: 6px 6px 0 #2b1d4a; --t-btn-border: 4px solid #2b1d4a;
+  --t-display: 'Fredoka', sans-serif; --t-body: 'Fredoka', sans-serif;
+  --t-title-size: clamp(60px, 11vw, 136px); --t-title-shadow: 6px 6px 0 #2b1d4a; --t-title-shadow-sm: 3px 3px 0 #2b1d4a;
+  --t-title-stroke: 3px #2b1d4a;
+  --t-cam-bg: #2b1d4a; --t-cam-dim: rgba(43,29,74,.6); --t-frame-border: 6px solid #fff; --t-frame-radius: 24px;
+  --t-count-color: #ffd400; --t-count-shadow: 8px 8px 0 #ff3d8b; --t-count-stroke: 6px #2b1d4a;
+}
+
+/* ---------- Shell ---------- */
+.top-bar { display: none !important; }
+.ui-decor { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.ui-decor svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+body:not([data-view="viewWelcome"]) .ui-decor .big { display: none; }
+#mainStage {
+  position: relative; z-index: 1; height: 100vh; height: 100dvh; overflow-y: auto;
+  color: var(--t-ink); font-family: var(--t-body);
+}
+.stage.standard-container { max-width: none; padding: 4vh 5vw; display: flex; }
+.stage.standard-container > .view-panel.active { margin: auto 0; }
+.admin-hotcorner { position: fixed; top: 0; right: 0; width: 90px; height: 90px; z-index: 60; touch-action: none; }
+.admin-hotcorner::after {
+  content: ""; position: absolute; top: 18px; right: 18px; width: 8px; height: 8px; border-radius: 50%;
+  background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.25); opacity: .6;
+}
+body:has(.admin-modal.active) .admin-hotcorner { display: none; }
+.admin-hotcorner.pressing::after { transform: scale(2.2); opacity: 1; transition: transform .9s linear; }
+@keyframes uiPulse { 50% { opacity: .35; } }
+
+/* Buttons (guest screens only) */
+.stage .btn-primary {
+  font-family: var(--t-btn-font, var(--t-display)); font-weight: var(--t-btn-weight, 700);
+  font-size: clamp(20px, 2.4vw, 30px); padding: .75em 2em; gap: 14px;
+  border-radius: var(--t-btn-radius); background: var(--t-accent); color: var(--t-on-accent);
+  border: var(--t-btn-border); box-shadow: var(--t-btn-shadow); text-shadow: none;
+  text-transform: var(--t-btn-case, none); letter-spacing: var(--t-btn-track, .01em); transform: var(--t-btn-skew, none);
+}
+.stage .btn-primary:hover { background: var(--t-accent); box-shadow: var(--t-btn-shadow); transform: var(--t-btn-skew, none); filter: brightness(1.06); }
+.stage .btn-primary:active { transform: var(--t-btn-skew, none) scale(.96); box-shadow: var(--t-btn-shadow); }
+.stage .btn-primary .icon { width: 1em; height: 1em; }
+.stage .btn-secondary {
+  font-family: var(--t-btn-font, var(--t-display)); font-weight: var(--t-btn-weight, 600);
+  font-size: clamp(16px, 1.7vw, 21px); padding: .75em 1.6em;
+  border-radius: var(--t-btn-radius); background: var(--t-chip); color: var(--t-ink);
+  border: 2px solid var(--t-line); box-shadow: none;
+  text-transform: var(--t-btn-case, none); letter-spacing: var(--t-btn-track, .01em);
+}
+.stage .btn-secondary:hover { background: var(--t-chip); border-color: var(--t-accent); }
+
+/* Shared text */
+.stage .hero-tagline {
+  background: none; border: 0; padding: 0; transform: none; margin: 0 0 14px;
+  font: 800 clamp(12px, 1.3vw, 16px) 'Plus Jakarta Sans', sans-serif; letter-spacing: .32em;
+  color: var(--t-kicker); text-transform: uppercase;
+}
+
+/* 1. Welcome — no card, big title, tap anywhere */
+#viewWelcome.active { cursor: pointer; }
+.stage .kiosk-welcome-hero {
+  background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible;
+  max-width: 1100px; margin: 0 auto; padding: 0;
+}
+.stage .kiosk-welcome-hero::before, .stage .kiosk-meta-pills { display: none; }
+.stage .hero-title {
+  font-family: var(--t-display); font-size: var(--t-title-size); font-weight: 700; line-height: 1.05;
+  color: var(--t-title); text-shadow: var(--t-title-shadow); -webkit-text-stroke: var(--t-title-stroke, 0);
+  paint-order: stroke fill; transform: var(--t-title-skew, none); letter-spacing: var(--t-track, 0);
+  margin: 0 0 .25em; overflow-wrap: anywhere;
+}
+.stage .hero-sub { font-family: var(--t-body); font-size: clamp(17px, 1.9vw, 24px); color: var(--t-muted); max-width: 700px; margin: 0 auto 5vh; }
+.welcome-touch-hint { margin-top: 3vh; font: 800 14px 'Plus Jakarta Sans', sans-serif; letter-spacing: .24em; color: var(--t-muted); animation: uiPulse 1.6s infinite; }
+
+/* 2. Layout */
+.stage .section-header { margin: 0 auto 4vh; max-width: 900px; }
+.stage .section-header h2 {
+  font-family: var(--t-display); font-size: clamp(34px, 4.6vw, 60px); font-weight: 700; color: var(--t-title);
+  text-shadow: var(--t-title-shadow-sm, none); letter-spacing: var(--t-track, 0); line-height: 1.1;
+}
+.stage .section-header p { color: var(--t-muted); font-size: clamp(15px, 1.5vw, 19px); }
+.stage .layout-cards-grid { max-width: 1150px; gap: 2.4vw; grid-template-columns: repeat(3, 1fr); margin: 0 auto 4vh; }
+.stage .card-layout-item,
+.stage .card-layout-item:hover {
+  background: var(--t-card); border: var(--t-card-border); border-radius: var(--t-card-radius);
+  box-shadow: var(--t-card-shadow); padding: 24px; align-items: center; text-align: center; transform: none;
+}
+.stage .card-layout-item.selected {
+  background: var(--t-card); border: var(--t-card-border); box-shadow: var(--t-card-shadow);
+  outline: 6px solid var(--t-accent); outline-offset: -6px; transform: translateY(-4px);
+}
+.stage .layout-schematic { background: transparent; border: 0; height: 26vh; margin-bottom: 12px; }
+.stage .mini-receipt-strip { background: #fff; border: 0; box-shadow: 0 6px 18px rgba(0,0,0,.18); padding: 8px; gap: 6px; }
+.stage .mini-photo-slot { width: 8vh; height: 8vh; background: linear-gradient(135deg, #c8ccd4, #9aa1ad); border: 0; border-radius: 0; }
+.stage .card-layout-item[data-layout="single"] .mini-photo-slot { width: 13vh !important; height: 13vh !important; }
+.stage .card-item-title { font-family: var(--t-display); font-size: clamp(22px, 2.6vw, 34px); color: var(--t-card-ink, var(--t-title)); letter-spacing: var(--t-track, 0); }
+.stage .card-item-desc { color: var(--t-card-muted, var(--t-muted)); font-size: clamp(13px, 1.3vw, 16px); }
+.stage .card-bottom-row { justify-content: center; gap: 8px; flex-wrap: wrap; }
+.stage .badge { border: 0 !important; background: var(--t-accent2); color: var(--t-on-accent2); font-size: 11px; padding: 6px 12px; border-radius: 99px; }
+.stage .badge-muted { background: transparent; color: var(--t-card-muted, var(--t-muted)); border: 1px solid currentColor !important; }
+
+/* 3. Camera — edge to edge, controls on the sides */
+.stage .camera-studio-container { height: 100vh; height: 100dvh; min-height: 0; background: var(--t-cam-bg); }
+.stage .camera-viewfinder { background: var(--t-cam-bg); }
+.stage .camera-grid-lines { display: none; }
+.stage .studio-top-overlay { background: transparent; border: 0; backdrop-filter: none; justify-content: center; padding-top: 3vh; pointer-events: none; }
+.stage .studio-top-overlay > div:last-child { display: none !important; }
+.stage .studio-prompt-text {
+  font-family: var(--t-btn-font, var(--t-display)); font-weight: var(--t-btn-weight, 700); font-size: clamp(17px, 2.1vw, 26px);
+  background: var(--t-accent); color: var(--t-on-accent); padding: 10px 26px; border-radius: 99px;
+  border: var(--t-btn-border); box-shadow: 0 6px 20px rgba(0,0,0,.35);
+  text-transform: var(--t-btn-case, none); letter-spacing: .04em; max-width: 60vw; text-align: center;
+}
+.stage .studio-prompt-text .pulse-dot { display: none; }
+.stage .square-framing-box { border: var(--t-frame-border); border-radius: var(--t-frame-radius, 0); box-shadow: 0 0 0 9999px var(--t-cam-dim); }
+.stage .square-framing-box::before { display: none; }
+.square-framing-box .frame-art { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.stage .studio-countdown-hud {
+  font-family: var(--t-display); color: var(--t-count-color); text-shadow: var(--t-count-shadow);
+  -webkit-text-stroke: var(--t-count-stroke); paint-order: stroke fill; font-size: clamp(140px, 30vh, 300px);
+}
+.stage .studio-intermission-hud { background: var(--t-card); border: var(--t-card-border); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+.stage .intermission-title { font-family: var(--t-display); color: var(--t-card-ink, var(--t-title)); font-size: clamp(24px, 3vw, 38px); letter-spacing: var(--t-track, 0); }
+.stage .intermission-sub { color: var(--t-card-muted, var(--t-muted)); font-family: var(--t-body); font-size: 16px; }
+.stage .intermission-bar-track { background: rgba(127,127,127,.2); border: 0; height: 12px; }
+.stage .intermission-bar-fill { background: var(--t-accent); }
+.stage .camera-bottom-deck { position: absolute; inset: 0; background: transparent; border: 0; backdrop-filter: none; padding: 0; display: block; pointer-events: none; }
+.stage .deck-flank-left, .stage .shutter-btn-wrapper {
+  position: absolute; top: 0; bottom: 0; width: max(130px, calc((100vw - 100vh) / 2)); transform: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; pointer-events: auto;
+}
+.stage .deck-flank-left { left: 0; }
+.stage .shutter-btn-wrapper { left: auto; right: 0; }
+.stage .reel-preview-cluster { flex-direction: column; gap: 14px; }
+.stage .mini-reel-thumb {
+  width: min(11vh, 100px); height: min(11vh, 100px); border: 3px dashed rgba(255,255,255,.55); border-radius: 12px;
+  background: rgba(0,0,0,.25); color: #fff; font: 700 20px 'Plus Jakarta Sans', sans-serif;
+}
+.stage .mini-reel-thumb:has(img) { border: 3px solid #fff; }
+.stage .camera-red-shutter {
+  width: min(16vh, 140px); height: min(16vh, 140px); border: 8px solid #fff; padding: 6px;
+  box-shadow: 0 0 0 6px var(--t-accent), 0 10px 30px rgba(0,0,0,.5);
+}
+.stage .shutter-inner-core { background: var(--t-accent); box-shadow: none; }
+.stage .camera-red-shutter.capturing { border-color: var(--t-accent2); }
+.stage .shutter-instruction-label { color: #fff; font: 800 12px 'Plus Jakarta Sans', sans-serif; letter-spacing: .14em; text-align: center; }
+.stage .deck-flank-right { position: absolute; left: 24px; bottom: 24px; pointer-events: auto; }
+.stage .deck-flank-right .btn-secondary { font-size: 16px; padding: 12px 22px; background: rgba(0,0,0,.45); color: #fff; border: 2px solid rgba(255,255,255,.45); }
+
+/* Racing: start lights instead of numbers */
+body[data-ui="racing"] .studio-countdown-hud { font-size: 0 !important; -webkit-text-stroke: 0; text-shadow: none; }
+body[data-ui="racing"] .studio-countdown-hud::before {
+  content: ""; display: block; width: min(60vw, 420px); height: min(20vw, 140px); border-radius: 24px; border: 4px solid #333;
+  --l1: #3a0d0d; --l2: #3a0d0d; --l3: #3a0d0d;
+  background:
+    radial-gradient(circle closest-side, var(--l1) 72%, transparent 75%) 0 50% / 33.34% 100% no-repeat,
+    radial-gradient(circle closest-side, var(--l2) 72%, transparent 75%) 50% 50% / 33.34% 100% no-repeat,
+    radial-gradient(circle closest-side, var(--l3) 72%, transparent 75%) 100% 50% / 33.34% 100% no-repeat, #111;
+}
+body[data-ui="racing"] .studio-countdown-hud[data-n="3"]::before,
+body[data-ui="racing"] .studio-countdown-hud[data-n="4"]::before,
+body[data-ui="racing"] .studio-countdown-hud[data-n="5"]::before { --l1: #ff2a2a; }
+body[data-ui="racing"] .studio-countdown-hud[data-n="2"]::before { --l1: #ff2a2a; --l2: #ff2a2a; }
+body[data-ui="racing"] .studio-countdown-hud[data-n="1"]::before { --l1: #ff2a2a; --l2: #ff2a2a; --l3: #ff2a2a; }
+body[data-ui="racing"] .studio-countdown-hud[data-n="go"]::before { --l1: #2bff6a; --l2: #2bff6a; --l3: #2bff6a; }
+
+/* 4. Output */
+.stage .output-studio-layout { max-width: 1200px; width: 100%; grid-template-columns: minmax(300px, 380px) 1fr; gap: 5vw; align-items: center; }
+.stage .receipt-scroll-container { max-height: 88vh; background: transparent; border: 0; }
+.stage .output-panel-sticky { background: transparent; border: 0; box-shadow: none; padding: 0; position: static; }
+.stage .output-panel-sticky h2 {
+  font-family: var(--t-display) !important; font-weight: 700 !important; font-size: clamp(40px, 5.5vw, 76px) !important;
+  line-height: 1.05; color: var(--t-title); text-shadow: var(--t-title-shadow-sm, none) !important;
+  letter-spacing: var(--t-track, 0) !important; transform: var(--t-title-skew, none); transform-origin: left;
+  margin: 6px 0 18px !important; -webkit-text-stroke: 0;
+}
+.stage .output-panel-sticky p { color: var(--t-muted) !important; font-size: clamp(16px, 1.7vw, 21px) !important; max-width: 540px; }
+.stage #autoResetPill { background: var(--t-chip); color: var(--t-ink); border: 2px solid var(--t-line) !important; font-size: 13px; }
+@media (max-width: 900px) {
+  .stage .layout-cards-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .stage .output-studio-layout { grid-template-columns: 1fr; }
+}
+
+/* Admin: booth theme picker */
+.ui-theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 26px; }
+.ui-theme-card { cursor: pointer; border: 3px solid var(--ink); border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 3px 3px 0 var(--ink); position: relative; }
+.ui-theme-card.active { box-shadow: 0 0 0 4px var(--pink), 3px 3px 0 var(--ink); }
+.ui-theme-card .prev { height: 92px; display: grid; place-items: center; padding: 6px; text-align: center; line-height: 1.05; overflow: hidden; }
+.ui-theme-card .meta { padding: 8px 10px; border-top: 2px solid var(--ink); }
+.ui-theme-card .meta b { display: block; font-size: 14px; color: var(--ink); }
+.ui-theme-card .meta span { font-size: 11px; color: var(--text-muted); }
+.ui-theme-card .on { display: none; position: absolute; top: 6px; right: 6px; font-size: 10px; font-weight: 800; background: var(--pink); color: #fff; border-radius: 99px; padding: 3px 8px; }
+.ui-theme-card.active .on { display: block; }
 </style>
 </head>
-<body>
+<body data-ui="vintage" data-view="viewWelcome">
+<div class="ui-decor" id="uiDecor" aria-hidden="true"></div>
+<div class="admin-hotcorner" id="adminHotCorner" title="Long-press for Admin"></div>
 
 <!-- TOP TELEMETRY BAR -->
 <header class="top-bar">
@@ -1403,7 +1743,7 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
         Step up, strike a pose, and take home an authentic thermal receipt keepsake with your photos and digital download link!
       </p>
       
-      <button class="btn-primary" id="btnTouchToStart" style="font-size:17px;padding:18px 42px">
+      <button class="btn-primary" id="btnTouchToStart">
         <span>TOUCH TO START</span>
         <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </button>
@@ -1422,6 +1762,7 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
           1-Bit Dithered Dot Matrix
         </span>
       </div>
+      <div class="welcome-touch-hint">TOUCH ANYWHERE</div>
     </div>
   </section>
 
@@ -1543,7 +1884,7 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
 
         <!-- Flank Right: Cancel Button -->
         <div class="deck-flank-right">
-          <button class="btn-secondary" id="btnStudioCancel" style="padding:10px 18px;font-size:13px">
+          <button class="btn-secondary" id="btnStudioCancel">
             Cancel
           </button>
         </div>
@@ -1561,7 +1902,7 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
         <div class="receipt-wrapper">
           <div class="thermal-sheet" id="renderedReceipt">
             <div class="rcpt-center">
-              <div style="font-size:9px;letter-spacing:4px">★ ★ ★ ★ ★</div>
+              <div style="font-size:9px;letter-spacing:4px" id="rcptOrnament">* * * * *</div>
               <div class="rcpt-header-title" id="rcptEventTitle">WELCOME</div>
               <div class="rcpt-header-sub" id="rcptEventSub">OCTOBER 24, 2026 · TAGAYTAY</div>
               <div class="rcpt-divider"></div>
@@ -1609,17 +1950,17 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
         </div>
         <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px">Your Receipt Is Ready</h2>
         <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:24px">
-          Tap the button below to feed your custom thermal receipt from the printer. Scan the QR code on the paper with your smartphone to download the high-resolution original images.
+          Tap print, then grab your receipt from the printer. Scan the QR code on it to save your photo.
         </p>
 
         <div style="display:flex;flex-direction:column;gap:12px">
-          <button class="btn-primary" id="btnOutputPrint" style="font-size:16px;padding:18px">
+          <button class="btn-primary" id="btnOutputPrint">
             <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M6 9V4h12v5"/><rect width="12" height="8" x="6" y="14" rx="1"/></svg>
-            <span>PRINT THERMAL RECEIPT</span>
+            <span>Print my receipt</span>
           </button>
 
           <button class="btn-secondary" id="btnOutputFinish">
-            Finished · Return to Welcome
+            Done
           </button>
         </div>
       </div>
@@ -1665,7 +2006,7 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
         </button>
         <button class="sidebar-btn" data-tab="tabTemplate">
           <svg class="icon icon-sm" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-          2. Theme & Frames
+          2. Theme & Receipt Style
         </button>
         <button class="sidebar-btn" data-tab="tabReceipt">
           <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/></svg>
@@ -1702,9 +2043,14 @@ input[type="range"] { accent-color: var(--pink); height: 28px; }
 
         <!-- TAB 2: THEME & TILE FRAMES WITH INTERACTIVE LIVE PREVIEW -->
         <div class="admin-tab-pane" id="tabTemplate">
+          <div class="form-row">
+            <label class="form-label">Booth Theme (whole app)</label>
+            <div class="form-help" style="margin-bottom:10px">Changes the guest screens: colours, fonts, buttons, background art, camera frame and countdown. Tap a theme to preview it, then press <b>Save</b>.</div>
+            <div class="ui-theme-grid" id="uiThemeGrid"></div>
+          </div>
           <div class="theme-preview-workspace">
             <div>
-              <label class="form-label">Event Theme Presets (8 Available)</label>
+              <label class="form-label">Receipt Style Presets (8 Available)</label>
               <div class="presets-grid">
                 <div class="preset-card active" data-theme="wedding">
                   <strong>Wedding Keepsake</strong>
@@ -1977,6 +2323,7 @@ const defaultConfig = {
   eventTagline: "OCTOBER 24, 2026 · TAGAYTAY",
   welcomeDesc: "Step up, strike a pose, and take home an authentic thermal receipt keepsake with your photos and digital download link!",
   theme: "wedding",
+  uiTheme: "vintage",   // booth theme for the guest screens (Admin > Theme)
   tileFrame: "frame-postage",
   dithering: true,
   sessionPrefix: "#0042",
@@ -2122,6 +2469,7 @@ function switchView(targetViewId) {
   targetPanel.classList.add('active');
   targetPanel.classList.add(isForward ? 'anim-forward' : 'anim-backward');
   currentActiveView = targetViewId;
+  document.body.dataset.view = targetViewId;
 
   if (targetViewId !== 'viewCamera') {
     closeMediaStream();
@@ -2278,6 +2626,7 @@ async function startAutomaticMultiShotSession() {
     for (let count = appConfig.countdown; count > 0; count--) {
       if (!isAutoCapturing) break;
       visor.textContent = count;
+      visor.dataset.n = count;
       playBeep(count === 1 ? 1200 : 880, 0.08);
       await new Promise(r => setTimeout(r, 1000));
     }
@@ -2286,6 +2635,7 @@ async function startAutomaticMultiShotSession() {
 
     // Flash & Shutter Sound
     visor.textContent = "✦";
+    visor.dataset.n = 'go';
     playShutterClick();
     flash.style.opacity = '1';
     setTimeout(() => flash.style.opacity = '0', 200);
@@ -2567,6 +2917,8 @@ function loadAdminInputs() {
   document.getElementById('cfgDriveSecret').value = appConfig.driveSecret;
   document.getElementById('cfgDriveEvent').value = appConfig.driveEvent || '';
   document.getElementById('cfgQrMode').value = appConfig.qrMode || 'photo';
+  uiThemeDraft = null;
+  applyUiTheme(appConfig.uiTheme);
   refreshDriveStatus();
   document.getElementById('cfgCountdownDuration').value = appConfig.countdown;
   document.getElementById('cfgIntervalBetweenShots').value = appConfig.intervalPause;
@@ -2698,6 +3050,8 @@ document.getElementById('btnSaveAdminConfig').onclick = () => {
   appConfig.driveSecret = document.getElementById('cfgDriveSecret').value.trim();
   appConfig.driveEvent = document.getElementById('cfgDriveEvent').value.trim();
   appConfig.qrMode = document.getElementById('cfgQrMode').value;
+  if (uiThemeDraft) appConfig.uiTheme = uiThemeDraft;
+  uiThemeDraft = null;
   appConfig.countdown = parseInt(document.getElementById('cfgCountdownDuration').value, 10);
   appConfig.intervalPause = parseInt(document.getElementById('cfgIntervalBetweenShots').value, 10);
   appConfig.autoResetTime = parseInt(document.getElementById('cfgAutoResetTime').value, 10);
@@ -3176,7 +3530,7 @@ async function renderReceiptCanvas(color) {
   };
 
   let y = 20;
-  g.font = `bold 22px ${MONO}`; g.fillText('* * * * *', W / 2, y); y += 36;
+  g.font = `bold 22px ${MONO}`; g.fillText(uiOrnament(), W / 2, y); y += 36;
   fit(appConfig.eventTitle, 38, 'bold'); g.fillText(appConfig.eventTitle, W / 2, y); y += 52;
   fit(appConfig.eventTagline, 22, 'normal'); g.fillText(appConfig.eventTagline, W / 2, y); y += 36;
   dash(y); y += 14;
@@ -3295,6 +3649,172 @@ document.getElementById('eventBadgeText').textContent = appConfig.eventTitle;
 document.getElementById('heroEventTitle').textContent = appConfig.eventTitle;
 document.getElementById('heroWelcomeDesc').textContent = appConfig.welcomeDesc;
 document.getElementById('badgeIntervalInfo').textContent = `${appConfig.intervalPause}s Pose Interval`;
+
+/* ========================================================== */
+/* BOOTH THEMES (whole guest UI) — picked in Admin > Theme     */
+/* ========================================================== */
+const SVG_OPEN = '<svg viewBox="0 0 1180 820" preserveAspectRatio="xMidYMid slice">';
+const FRAME_OPEN = '<svg class="frame-art" viewBox="0 0 820 820" preserveAspectRatio="none">';
+const CHK = (id, s) => `<defs><pattern id="${id}" width="${s * 2}" height="${s * 2}" patternUnits="userSpaceOnUse"><rect width="${s}" height="${s}" fill="#111"/><rect x="${s}" y="${s}" width="${s}" height="${s}" fill="#111"/><rect x="${s}" width="${s}" height="${s}" fill="#fff"/><rect y="${s}" width="${s}" height="${s}" fill="#fff"/></pattern></defs>`;
+const HEART = 'M0 12 C -22 -4 -22 -22 -8 -24 C -2 -25 0 -20 0 -18 C 0 -20 2 -25 8 -24 C 22 -22 22 -4 0 12Z';
+const SPARK = 'M0 -14 C2 -2 2 -2 14 0 C2 2 2 2 0 14 C-2 2 -2 2 -14 0 C-2 -2 -2 -2 0 -14Z';
+const CAP = '<path d="M-80 0 L0 -36 L80 0 L0 36Z" fill="#111"/><path d="M-46 14 v34 q46 26 92 0 v-34 L0 36Z" fill="#222"/><path d="M0 0 L60 10 v50" stroke="#f2b705" stroke-width="4" fill="none"/><circle cx="60" cy="64" r="7" fill="#f2b705"/>';
+const MUSH = c => `<rect x="-10" y="0" width="20" height="60" fill="#fff0e0"/><path d="M-60 0 a60 40 0 0 1 120 0Z" fill="${c}"/><circle cx="-22" cy="-15" r="7" fill="#fff"/><circle cx="18" cy="-20" r="6" fill="#fff"/>`;
+
+const UI_THEMES = {
+  vintage: {
+    name: 'Vintage', note: 'Original look · playful pop', orn: '* * * * *',
+    prev: "background:#fff6e8;font-family:Fredoka;font-weight:700;font-size:26px;color:#2b1b4a;text-shadow:2px 2px 0 #ffd23f",
+    decor: `<g class="big" stroke="#2b1b4a" stroke-width="3" fill="#ffd23f"><path d="M160 600 l12 26 28 4 -20 20 5 28 -25 -13 -25 13 5 -28 -20 -20 28 -4Z"/><path d="M1000 170 l10 22 24 3 -17 17 4 24 -21 -11 -21 11 4 -24 -17 -17 24 -3Z" fill="#4cc9f0"/></g>
+      <path class="big" d="M940 650 q 30 -40 60 0 t 60 0 t 60 0" fill="none" stroke="#ff5c8a" stroke-width="6" stroke-linecap="round"/>
+      <path class="big" d="M80 200 q 30 -40 60 0 t 60 0" fill="none" stroke="#7b5cff" stroke-width="6" stroke-linecap="round"/>`,
+    frame: ''
+  },
+  cartoony: {
+    name: 'Cartoony', note: 'Comic book · bold · fun', orn: '!! * !! * !!',
+    prev: "background:radial-gradient(rgba(230,40,40,.3) 2px,transparent 2.5px) 0 0/12px 12px,#ffe14d;font-family:Bangers;font-size:30px;color:#ff2e2e;-webkit-text-stroke:1.5px #111;text-shadow:2px 2px 0 #111",
+    decor: `<g class="big"><path d="M90 70 l30 40 45 -25 -5 50 50 10 -40 30 30 40 -50 -5 -10 50 -30 -40 -40 30 5 -50 -50 -10 40 -30 -30 -40 50 5Z" fill="#ff2e2e" stroke="#111" stroke-width="5"/>
+      <text x="125" y="175" font-family="Bangers" font-size="44" fill="#fff" stroke="#111" stroke-width="2" transform="rotate(-12 125 175)">POW!</text>
+      <path d="M960 560 l26 34 40 -20 -4 44 44 8 -36 26 26 34 -44 -4 -8 44 -26 -34 -36 26 4 -44 -44 -8 36 -26 -26 -34 44 4Z" fill="#1e6bff" stroke="#111" stroke-width="5"/>
+      <text x="985" y="660" font-family="Bangers" font-size="38" fill="#ffe14d" stroke="#111" stroke-width="2" transform="rotate(10 985 660)">WOW!</text>
+      <path d="M900 90 h200 a20 20 0 0 1 20 20 v70 a20 20 0 0 1 -20 20 h-130 l-40 40 10 -40 h-40 a20 20 0 0 1 -20 -20 v-70 a20 20 0 0 1 20 -20Z" fill="#fff" stroke="#111" stroke-width="5"/>
+      <text x="925" y="160" font-family="Bangers" font-size="40" fill="#111">SAY CHEESE!</text></g>`,
+    frame: `<rect x="18" y="18" width="784" height="784" fill="none" stroke="#fff" stroke-width="4"/>`
+  },
+  racing: {
+    name: 'Racing', note: 'Red · checkered · speed', orn: '#-#-#-#-#-#-#',
+    prev: "background:linear-gradient(#e9632b,#f6d18a 60%,#2a2a2f 60%);font-family:'Racing Sans One';font-size:24px;color:#fff;font-style:italic;text-shadow:2px 2px 0 #e10600,4px 4px 0 #111",
+    decor: `${CHK('chkA', 20)}<rect width="1180" height="40" fill="url(#chkA)"/><rect y="780" width="1180" height="40" fill="url(#chkA)"/>
+      <g class="big" fill="#7a3b12" opacity=".45"><path d="M0 508 L90 380 L170 440 L260 340 L360 508Z"/><path d="M820 508 L930 360 L1010 420 L1100 330 L1180 400 L1180 508Z"/></g>
+      <g class="big" fill="#fff"><rect x="80" y="728" width="160" height="12" rx="6"/><rect x="380" y="728" width="160" height="12" rx="6"/><rect x="680" y="728" width="160" height="12" rx="6"/><rect x="980" y="728" width="160" height="12" rx="6"/></g>
+      <g class="big" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"><path d="M60 200 h120"/><path d="M30 240 h170"/><path d="M80 280 h90"/><path d="M1000 160 h130"/><path d="M970 200 h170"/><path d="M1030 240 h90"/></g>`,
+    frame: `${CHK('chkB', 15)}<rect width="820" height="24" fill="url(#chkB)"/><rect y="796" width="820" height="24" fill="url(#chkB)"/>`
+  },
+  fairy: {
+    name: 'Fairy', note: 'Twilight garden · sparkles', orn: '* . * . * . *',
+    prev: "background:radial-gradient(ellipse at 50% 110%,#ffb3e1,transparent 60%),#3b2370;font-family:'Cinzel Decorative';font-size:17px;color:#fff3c4;text-shadow:0 0 12px rgba(255,220,150,.9)",
+    decor: `<g class="big" fill="#fff3c4">${[[140,120],[1040,90],[300,300],[900,260],[1100,420],[70,470],[620,60]].map(([x,y]) => `<path transform="translate(${x} ${y})" d="${SPARK}"/>`).join('')}</g>
+      <g fill="#fff" opacity=".7"><circle cx="220" cy="210" r="2"/><circle cx="980" cy="180" r="2"/><circle cx="460" cy="120" r="2"/><circle cx="780" cy="110" r="2"/><circle cx="1010" cy="330" r="2"/><circle cx="160" cy="380" r="2"/></g>
+      <g class="big"><circle cx="1050" cy="150" r="46" fill="#fff3c4" opacity=".9"/><circle cx="1070" cy="138" r="40" fill="#4a2c8f"/>
+      <g transform="translate(110 690)">${MUSH('#ff7ac8')}</g><g transform="translate(190 720) scale(.6)">${MUSH('#9ff3d8')}</g><g transform="translate(1060 700)">${MUSH('#b48cff')}</g></g>`,
+    frame: `<g fill="#fff3c4"><path transform="translate(40 34)" d="${SPARK}"/><path transform="translate(780 786)" d="${SPARK}"/></g>`
+  },
+  formal: {
+    name: 'Formal', note: 'Corporate · gala · navy & gold', orn: '-- <> --',
+    prev: "background:#0c1527;font-family:'Playfair Display';font-weight:800;font-size:22px;color:#fff;border:1px solid #c9a54c;outline:5px solid #0c1527;outline-offset:-10px",
+    decor: `<g fill="none" stroke="#c9a54c" stroke-width="2" opacity=".85"><path d="M30 140 V30 H140"/><path d="M45 110 V45 H110"/><path d="M1150 140 V30 H1040"/><path d="M1135 110 V45 H1070"/><path d="M30 680 V790 H140"/><path d="M45 710 V775 H110"/><path d="M1150 680 V790 H1040"/><path d="M1135 710 V775 H1070"/></g>
+      <g class="big" fill="none" stroke="#c9a54c" stroke-width="1.5" opacity=".6"><path d="M440 90 h300"/><path d="M490 100 h200"/><path d="M440 740 h300"/><path d="M490 730 h200"/><path d="M590 70 l10 -10 10 10 -10 10Z" fill="#c9a54c"/><path d="M590 760 l10 -10 10 10 -10 10Z" fill="#c9a54c"/></g>`,
+    frame: `<path d="M8 80 V8 H80 M812 80 V8 H740 M8 740 V812 H80 M812 740 V812 H740" fill="none" stroke="#c9a54c" stroke-width="8"/>`
+  },
+  wedding: {
+    name: 'Wedding', note: 'Ivory · gold · script', orn: '~ ~ ~ <3 ~ ~ ~',
+    prev: "background:linear-gradient(#fffdf8,#efe4d2);font-family:'Great Vibes';font-size:34px;color:#6b5233",
+    decor: `<g fill="none" stroke="#c9ab7a" stroke-width="2" opacity=".55"><path d="M0 160 C 80 140, 140 80, 160 0"/><path d="M0 230 C 120 200, 210 110, 230 0"/><path d="M1180 660 C 1100 680, 1040 740, 1020 820"/><path d="M1180 590 C 1060 620, 970 710, 950 820"/></g>
+      <g fill="#e8d3d0"><circle cx="70" cy="70" r="26"/><circle cx="130" cy="40" r="16"/><circle cx="40" cy="140" r="14"/><circle cx="1110" cy="750" r="26"/><circle cx="1050" cy="780" r="16"/><circle cx="1140" cy="680" r="14"/></g>
+      <g fill="#b9c4a8"><ellipse cx="110" cy="95" rx="22" ry="9" transform="rotate(-35 110 95)"/><ellipse cx="80" cy="120" rx="20" ry="8" transform="rotate(-60 80 120)"/><ellipse cx="1070" cy="725" rx="22" ry="9" transform="rotate(-35 1070 725)"/><ellipse cx="1100" cy="700" rx="20" ry="8" transform="rotate(-60 1100 700)"/></g>`,
+    frame: `<rect x="14" y="14" width="792" height="792" fill="none" stroke="#f3e2c0" stroke-width="1"/>`
+  },
+  christmas: {
+    name: 'Christmas', note: 'Pine · red · lights · snow', orn: '* + * + * + *',
+    prev: "background:radial-gradient(circle,rgba(255,255,255,.8) 1.5px,transparent 2px) 0 0/20px 20px,#0c3b2e;font-family:'Mountains of Christmas';font-weight:700;font-size:28px;color:#fff;text-shadow:0 2px 0 #c8102e",
+    decor: `<path class="big" d="M0 30 Q 148 90 295 30 T 590 30 T 885 30 T 1180 30" fill="none" stroke="#1d1d1d" stroke-width="3"/>
+      <g class="big" stroke="#111" stroke-width="1">${[74,148,222,369,443,517,664,738,812,959,1033,1107].map((x, i) => `<ellipse cx="${x}" cy="${i % 3 === 1 ? 66 : 56}" rx="9" ry="14" fill="${['#ff3b3b','#f5c542','#3bd16f','#4cc9f0'][i % 4]}"/>`).join('')}</g>
+      <g class="big"><path d="M110 760 l70 -150 70 150Z" fill="#1f7a4d"/><path d="M125 700 l55 -120 55 120Z" fill="#26915c"/><rect x="170" y="760" width="20" height="30" fill="#6b3d1f"/>
+      <path d="M180 570 l6 14 15 1 -12 9 4 15 -13 -8 -13 8 4 -15 -12 -9 15 -1Z" fill="#f5c542"/>
+      <rect x="960" y="720" width="80" height="70" fill="#c8102e"/><rect x="995" y="720" width="12" height="70" fill="#f5c542"/><rect x="960" y="745" width="80" height="12" fill="#f5c542"/>
+      <rect x="1050" y="740" width="60" height="50" fill="#f5c542"/><rect x="1074" y="740" width="10" height="50" fill="#c8102e"/><rect y="790" width="1180" height="30" fill="#fff" opacity=".9"/></g>`,
+    frame: `<rect x="6" y="6" width="808" height="808" fill="none" stroke="#fff" stroke-width="12" stroke-dasharray="24 24" stroke-dashoffset="24"/>`
+  },
+  valentines: {
+    name: 'Valentines', note: 'Blush pink · red · hearts', orn: '<3 <3 <3 <3 <3',
+    prev: "background:radial-gradient(ellipse,#fff0f4,#ffc2d4);font-family:Pacifico;font-size:22px;color:#e11d48;text-shadow:2px 2px 0 #fff",
+    decor: `<g fill="#ff8fab">${[[120,140],[1060,200],[980,640],[210,660]].map(([x,y]) => `<path transform="translate(${x} ${y})" d="${HEART}"/>`).join('')}</g>
+      <g class="big" fill="#e11d48"><path transform="translate(150 560) scale(3) rotate(-12)" d="${HEART}"/><path transform="translate(1040 420) scale(2.4) rotate(14)" d="${HEART}"/><path transform="translate(1000 120) scale(1.6)" d="${HEART}"/></g>
+      <g class="big" fill="#fff" opacity=".8"><path transform="translate(260 180) scale(1.4) rotate(10)" d="${HEART}"/><path transform="translate(880 700) scale(1.8) rotate(-10)" d="${HEART}"/></g>`,
+    frame: `<g fill="#e11d48"><path transform="translate(50 50) scale(1.3)" d="${HEART}"/><path transform="translate(770 780) scale(1.3)" d="${HEART}"/></g>`
+  },
+  graduation: {
+    name: 'Graduation', note: 'Navy · gold · caps', orn: '= = = = = = =',
+    prev: "background:#13294b;font-family:'Bebas Neue';font-size:34px;color:#f2b705;letter-spacing:.04em",
+    decor: `<g fill="#f2b705" opacity=".9"><rect x="120" y="90" width="10" height="20" transform="rotate(25 120 90)"/><rect x="330" y="60" width="8" height="18" transform="rotate(-20 330 60)"/><rect x="870" y="110" width="10" height="20" transform="rotate(40 870 110)"/><rect x="1060" y="300" width="8" height="18" transform="rotate(-35 1060 300)"/><rect x="220" y="680" width="10" height="20" transform="rotate(15 220 680)"/><rect x="940" y="700" width="8" height="18" transform="rotate(-25 940 700)"/><circle cx="560" cy="60" r="5"/><circle cx="90" cy="420" r="6"/><circle cx="1110" cy="560" r="5"/><circle cx="700" cy="770" r="5"/></g>
+      <g class="big"><g transform="translate(150 130) rotate(-15) scale(.8)">${CAP}</g><g transform="translate(1030 560) rotate(12) scale(.85)">${CAP}</g></g>`,
+    frame: ''
+  },
+  birthday: {
+    name: 'Birthday', note: 'Candy · confetti · balloons', orn: '* o * o * o *',
+    prev: "background:#fff6e9;font-family:Fredoka;font-weight:700;font-size:28px;color:#ff3d8b;-webkit-text-stroke:1px #2b1d4a;text-shadow:2px 2px 0 #2b1d4a",
+    decor: `<g><rect x="120" y="90" width="14" height="28" fill="#ff3d8b" transform="rotate(25 120 90)"/><rect x="320" y="60" width="12" height="24" fill="#22c3ee" transform="rotate(-20 320 60)"/><rect x="880" y="110" width="14" height="28" fill="#ff9f1c" transform="rotate(40 880 110)"/><rect x="200" y="640" width="14" height="28" fill="#7b3dff" transform="rotate(15 200 640)"/><circle cx="240" cy="200" r="8" fill="#ff9f1c"/><circle cx="980" cy="420" r="9" fill="#22c3ee"/><circle cx="700" cy="60" r="7" fill="#7b3dff"/><circle cx="520" cy="760" r="8" fill="#22c3ee"/></g>
+      <g class="big" stroke="#2b1d4a" stroke-width="4"><path d="M80 520 q 10 60 -10 120" fill="none"/><ellipse cx="80" cy="470" rx="46" ry="56" fill="#ff3d8b"/><path d="M150 560 q -10 60 10 110" fill="none"/><ellipse cx="150" cy="510" rx="40" ry="50" fill="#22c3ee"/><path d="M1090 260 q 10 60 -10 120" fill="none"/><ellipse cx="1090" cy="210" rx="46" ry="56" fill="#ff9f1c"/><path d="M1020 300 q -10 60 10 110" fill="none"/><ellipse cx="1020" cy="250" rx="40" ry="50" fill="#7b3dff"/></g>`,
+    frame: `<g stroke="#2b1d4a" stroke-width="3">${['#ff3d8b','#ffd400','#22c3ee'].map((c, i) => `<path d="M${i * 60} 0 l60 0 l-30 50Z" fill="${c}"/><path d="M${640 + i * 60} 0 l60 0 l-30 50Z" fill="${['#7b3dff','#ff3d8b','#ffd400'][i]}"/>`).join('')}</g>`
+  }
+};
+
+function uiThemeKey(k) { return UI_THEMES[k] ? k : 'vintage'; }
+function uiOrnament() { return UI_THEMES[uiThemeKey(appConfig.uiTheme)].orn; }
+
+// Paint the whole guest UI in theme k (does not save; Save in Admin does).
+function applyUiTheme(k) {
+  k = uiThemeKey(k);
+  const t = UI_THEMES[k];
+  document.body.dataset.ui = k;
+  document.getElementById('uiDecor').innerHTML = t.decor ? SVG_OPEN + t.decor + '</svg>' : '';
+  const box = document.querySelector('.square-framing-box');
+  if (box) box.innerHTML = t.frame ? FRAME_OPEN + t.frame + '</svg>' : '';
+  const orn = document.getElementById('rcptOrnament');
+  if (orn) orn.textContent = t.orn;
+  document.querySelectorAll('.ui-theme-card').forEach(c => c.classList.toggle('active', c.dataset.ui === k));
+}
+
+let uiThemeDraft = null;   // theme picked in Admin but not saved yet
+(function buildUiThemeGrid() {
+  const grid = document.getElementById('uiThemeGrid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(UI_THEMES).map(([k, t]) =>
+    `<div class="ui-theme-card" data-ui="${k}"><span class="on">ACTIVE</span>
+       <div class="prev" style="${t.prev}">${t.name}</div>
+       <div class="meta"><b>${t.name}</b><span>${t.note}</span></div></div>`).join('');
+  grid.querySelectorAll('.ui-theme-card').forEach(c => c.onclick = () => {
+    uiThemeDraft = c.dataset.ui;
+    applyUiTheme(uiThemeDraft);           // preview behind the admin window
+  });
+})();
+// Closing Admin without saving goes back to the saved theme.
+document.getElementById('btnCloseAdminConsole').addEventListener('click', () => {
+  uiThemeDraft = null;
+  applyUiTheme(appConfig.uiTheme);
+});
+
+// Hidden admin: long-press the top-right corner (or tap it 5 times).
+(function adminHotCorner() {
+  const hc = document.getElementById('adminHotCorner');
+  let timer = null, taps = 0, tapReset = null;
+  const cancel = () => { clearTimeout(timer); hc.classList.remove('pressing'); };
+  hc.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    hc.classList.add('pressing');
+    timer = setTimeout(() => { cancel(); promptAdminPin(); }, 900);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => hc.addEventListener(ev, cancel));
+  hc.addEventListener('click', () => {
+    taps++; clearTimeout(tapReset); tapReset = setTimeout(() => taps = 0, 1800);
+    if (taps >= 5) { taps = 0; promptAdminPin(); }
+  });
+})();
+
+// Welcome: touch anywhere to start.
+document.getElementById('viewWelcome').addEventListener('click', e => {
+  if (!e.target.closest('button')) document.getElementById('btnTouchToStart').click();
+});
+
+// Full screen on the first touch when opened in a normal browser tab.
+document.addEventListener('pointerdown', function goFullscreen() {
+  const standalone = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+  const el = document.documentElement;
+  if (!standalone && !document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {});
+}, { once: true });
+
+document.body.dataset.view = currentActiveView || 'viewWelcome';
+applyUiTheme(appConfig.uiTheme);
 </script>
 
 <script>
